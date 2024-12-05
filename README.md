@@ -1,9 +1,13 @@
 ## Introduction
 
+![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)
+
 Welcome to my portfolio project! This project showcases my skills and projects as a developer. It is built using Next.js and demonstrates my proficiency in modern web development technologies.
 
-## Getting Started
-
+## View My Proflio at 
+C0DEZ.vercel.app
 ### Prerequisites
 
 Make sure you have the following installed:
@@ -47,3 +51,5 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+![Project Screenshot](https://raw.githubusercontent.com/C0DE-Z/New-Portfolio/refs/heads/master/imgs/Web.png)
