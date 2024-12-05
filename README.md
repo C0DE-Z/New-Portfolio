@@ -1,5 +1,19 @@
+## Introduction
+
+Welcome to my portfolio project! This project showcases my skills and projects as a developer. It is built using Next.js and demonstrates my proficiency in modern web development technologies.
 
 ## Getting Started
+
+### Prerequisites
+
+Make sure you have the following installed:
+
+- Node.js
+- npm, yarn, pnpm, or bun
+
+### Installation
+
+Clone the repository and install dependencies:
 
 First, run the development server:
 
