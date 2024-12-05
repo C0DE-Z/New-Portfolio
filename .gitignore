@@ -32,14 +32,6 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
-# Remove LFS
-./public/models/fpv.gltf
-./pubic/models/fpv.bin
-./public/models/scene.gltf
-./public/models/scene.bin
-./public/models/scene2.gltf
-./public/models/scene2.bin
-./public/models/scene3.gltf
 
 
 # vercel
