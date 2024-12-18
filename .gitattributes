@@ -160,3 +160,4 @@ sketch
 *.wasm filter=lfs diff=lfs merge=lfs -text
 *.gl filter=lfs diff=lfs merge=lfs -text
 public/models/gpv.gltf filter=lfs diff=lfs merge=lfs -text
+public/models/fpv.gltf filter=lfs diff=lfs merge=lfs -text
