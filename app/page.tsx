@@ -15,6 +15,8 @@ import Projects from "../components/projects";
 import TextEffect from "../components/ui/textEffect";
 import Hero from "../components/hero";
 import About from "../components/about";
+import Contact from "../components/contact";
+
 export default function Home() {
   
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -62,6 +64,7 @@ export default function Home() {
         scene.add(gltf.scene);
       }, undefined, (error) => {
         console.error('An error occurred while loading the model:', error);
+        
       });
 
       // Starting zoom
@@ -132,20 +135,22 @@ export default function Home() {
 
   return (
     <div>
-      <section id="hero" className="relative min-h-screen">
+      <section id="hero" className="relative min-h-[75vh]">
         <Hero canvasRef={canvasRef}/>
       </section>
-      <section id="about" className="relative min-h-screen">
+      <section id="about" className="relative min-h-[25vh]">
         <GridBackground/>
         <About/> 
         </section>
-      <section id="projects" className="relative min-h-screen">
+      <section id="projects" className="relative min-h-[75vh]">
         <GridBackground/>            
         <Projects/>
       </section>
 
-      <section id="other" className="relative min-h-screen">
+      <section id="contact" className="relative min-h-[75vh]">
         <GridBackground/>
+        <Contact/>
+        
       </section>
       <div ref={footerRef} className="fixed bottom-0 w-full">
         <Footer/>
