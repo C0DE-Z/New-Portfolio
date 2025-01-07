@@ -1,5 +1,6 @@
 
 import { motion } from 'framer-motion';
+
 import styles from '../ui/Card.module.css';
 
 interface CardProps {
