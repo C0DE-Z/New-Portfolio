@@ -1,8 +1,14 @@
+import GridBackground from "../../components/ui/grid-backround";
+import TextEffect from "../../components/ui/textEffect";
+
 export default function games() {
     return (
-        <div>
-            <h1>Games</h1>
-            
-        </div>
+        <>
+    <section>
+        <GridBackground />
+        <TextEffect  title = "Games " desired = "Games" subtitle ="" />
+    
+     </section>
+   </>
     )
-}
+}   

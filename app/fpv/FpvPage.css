@@ -1,0 +1,38 @@
+.fpv-page {
+    text-align: center;
+    background-color: #f0f0f0;
+    padding: 20px;
+}
+
+.drone-display {
+    margin-top: 20px;
+}
+
+.drone-display h2 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.drone-display ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.drone-display li {
+    display: inline-block;
+    margin: 10px;
+    text-align: center;
+}
+
+.drone-display img {
+    width: 150px;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.drone-display span {
+    display: block;
+    margin-top: 5px;
+    font-size: 18px;
+}
