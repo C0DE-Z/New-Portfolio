@@ -13,6 +13,7 @@ const FpvPage = () => {
                     <li className="flex flex-col items-center">
                         <img className="w-48 h-auto rounded-lg shadow-lg" src="/images/fpv-quad.jpg" alt="5 FPV Quad" />
                         <span className="mt-4 text-xl">5&quot; FPV Quad</span>
+                         <span className="mt-4 text-base">5&quot; Parts: Speedybee405v3, Foxxer Razer Mini, Tbs source one v5, SpeedyBeetx800, Elrs, Stinger. </span>
                     </li>
                     <li className="flex flex-col items-center">
                         <img className="w-48 h-auto rounded-lg shadow-lg" src="/images/meteor-75.jpg" alt="Meteor 75 Whoop" />
@@ -30,7 +31,7 @@ const FpvPage = () => {
                         <span className="mt-4 text-l">Radio Master Zorro </span>
                     </li>
                     <li className="flex flex-col items-center">
-                        <span className="mt-4 text-xl">Goggles  </span>
+                        <span className="mt-4 text-xl">Goggles</span>
                         <span className="mt-4 text-l">BetaFpv Vr03</span>
                     </li>
                     <li className="flex flex-col items-center">
@@ -39,6 +40,7 @@ const FpvPage = () => {
                     </li>
                 </ul>
             </div>
+
             <GridBackground />
         </>
     );
