@@ -1,3 +1,4 @@
+"use client"
 import GridBackground from "../../components/ui/grid-backround";
 import TextEffect from "../../components/ui/textEffect";
 
@@ -6,7 +7,7 @@ export default function games() {
         <>
     <section>
         <GridBackground />
-        <TextEffect  title = "Games " desired = "Games" subtitle ="" />
+        <TextEffect  title = "Games " desired = "" subtitle ="" />
     
      </section>
    </>
