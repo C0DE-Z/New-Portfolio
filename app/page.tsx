@@ -6,8 +6,7 @@ import {SiLeetcode} from "react-icons/si";
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { motion } from 'framer-motion'; // Import Framer Motion
-import { IconType } from "react-icons";
+
 import React from "react";
 import Footer from "../components/footer";
 import GridBackground from "../components/ui/grid-backround";

@@ -14,14 +14,14 @@ export default function Projects() {
                 />
                  <Card 
                   title="Fpv Drones!"
-                  description="I Build Fpv Drones in real life, My main build uses a Speedybee405v3 for its stack and some other components."
+                  description="I Build Fpv Drones in real life, My main build uses a SpeedyBee 405v3 for its stack and some other components."
                   link="./fpv"
                   btn = "Read More"
                 />
 
                 <Card 
                   title="My Games"
-                  description="I create games for people. Some made on Unity, others on Roblox."
+                  description="I create games for people. Some made on Unity, others on Roblox. Please check out a list of games that i've worked worked on."
                   link="./games"
                   btn = "Explore"
                 />
@@ -34,7 +34,7 @@ export default function Projects() {
 
                  <Card 
                   title="Quick Note"
-                  description="A simple note taking app that allows you to take notes and save them for later. all data is locally stored with cookies! Speficaly built for High Seas from Hack Club"
+                  description="A simple note taking app that allows you to take notes and save them for later. all data is locally stored with cookies! Specifically  built for High Seas from Hack Club"
                   link="https://speedynotes.vercel.app"
                   btn="Visit"
                 />

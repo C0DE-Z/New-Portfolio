@@ -27,6 +27,12 @@ export default function games() {
                   link=""
                   btn = "View"
                 />
+          <Card 
+                  title="Pixel Racer"
+                  description="A 2D racing game made in unity made in a week for a final"
+                  link=""
+                  btn = "Source"
+                />
      </section>
    </>
     )
