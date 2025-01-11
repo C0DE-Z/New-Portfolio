@@ -1,17 +1,15 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client"
-import { useState, useEffect, useRef } from "react";
-import { FaGithub, FaInfoCircle, FaProjectDiagram} from "react-icons/fa";
-import {SiLeetcode} from "react-icons/si";
+import { useEffect, useRef } from "react";
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 import React from "react";
 import Footer from "../components/footer";
 import GridBackground from "../components/ui/grid-backround";
 import Projects from "../components/projects";
-import TextEffect from "../components/ui/textEffect";
 import Hero from "../components/hero";
 import About from "../components/about";
 import Contact from "../components/contact";
@@ -50,8 +48,11 @@ export default function Home() {
       controls.maxDistance = 300;
       
       const loader = new GLTFLoader();
+      const dracoLoader = new DRACOLoader();
+      dracoLoader.setDecoderPath('/draco/'); // Set the path to the Draco decoder
+      loader.setDRACOLoader(dracoLoader);
 
-      loader.load('/models/scene.glb', (gltf: { scene: THREE.Object3D<THREE.Object3DEventMap>; }) => {
+      loader.load('/models/fpv-drone/fpv.gltf', (gltf: { scene: THREE.Object3D<THREE.Object3DEventMap>; }) => {
         gltf.scene.traverse((child) => {
           if (child instanceof THREE.Mesh) {
             if (child.material.map) {
