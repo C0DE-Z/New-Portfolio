@@ -154,10 +154,4 @@ node_modules
 psd
 thumb
 sketch
-### GLTF ###
-*.gltf filter=lfs diff=lfs merge=lfs -text
-*.glb filter=lfs diff=lfs merge=lfs -text
-*.wasm filter=lfs diff=lfs merge=lfs -text
-*.gl filter=lfs diff=lfs merge=lfs -text
-public/models/gpv.gltf filter=lfs diff=lfs merge=lfs -text
-public/models/fpv.gltf filter=lfs diff=lfs merge=lfs -text
+

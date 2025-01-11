@@ -12,7 +12,6 @@
 /.next
 # testing
 /coverage
-/public/models/fpv.gltf
 # next.js
 /.next/
 /out/
