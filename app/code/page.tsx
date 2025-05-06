@@ -1,6 +1,5 @@
 "use client"
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 
 export default function CodePage() {
     const [code, setCode] = useState("");
@@ -11,7 +10,6 @@ export default function CodePage() {
         "TERMINAL v3.4.2 - SECURE ACCESS MODULE",
         "[ SYSTEM READY ]",
     ]);
-    const router = useRouter();
 
     // Type-writer effect for the terminal
     useEffect(() => {
