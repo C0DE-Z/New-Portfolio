@@ -22,6 +22,7 @@ export async function POST(request: NextRequest) {
             try {
                 const url = new URL(redirectUrl);
                 return NextResponse.redirect(url, { status: 302 });
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             } catch (e) {
                 return NextResponse.json({ error: 'Invalid redirect URL configuration' }, { status: 500 });
             }
@@ -29,6 +30,7 @@ export async function POST(request: NextRequest) {
 
         console.log("Invalid code, returning 404");
         return NextResponse.json({ error: 'Invalid code' }, { status: 404 });
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
         return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
     }
