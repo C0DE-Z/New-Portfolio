@@ -22,7 +22,7 @@
     "gray-matter": "^4.0.3",
     "loadscreen": "^0.18.14",
     "lucide-react": "^0.475.0",
-    "next": "15.0.3",
+    "next": "15.0.7",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^5.5.0",
