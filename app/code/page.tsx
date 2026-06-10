@@ -1,186 +1,230 @@
 "use client"
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import Navbar from "../../components/Navbar";
 
 export default function CodePage() {
-    const [code, setCode] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+    const [input, setInput] = useState("");
     const [terminalLines, setTerminalLines] = useState<string[]>([
-        "$ ./access_system",
-        "TERMINAL v3.4.2 - SECURE ACCESS MODULE",
-        "[ SYSTEM READY ]",
+        "Terminal Session Started [v1.0.4]",
+        "System: Active",
+        "Type 'help' to see list of available commands.",
+        ""
     ]);
+    const [commandHistory, setCommandHistory] = useState<string[]>([]);
+    const [historyIndex, setHistoryIndex] = useState(-1);
+    const [loading, setLoading] = useState(false);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
 
-    // Type-writer effect for the terminal
+    // Auto-scroll to bottom of terminal
     useEffect(() => {
-        const timer = setTimeout(() => {
-            setTerminalLines(prev => [...prev, "$ Waiting for authorization code..."]);
-        }, 1000);
-        return () => clearTimeout(timer);
-    }, []);
+        if (containerRef.current) {
+            containerRef.current.scrollTop = containerRef.current.scrollHeight;
+        }
+    }, [terminalLines]);
 
-    const addTerminalLine = (line: string) => {
-        setTerminalLines(prev => [...prev, line]);
+    // Keep focus on input
+    const focusInput = () => {
+        if (inputRef.current) {
+            inputRef.current.focus();
+        }
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setLoading(true);
-        setError(null);
-        
-        // Add terminal line effects
-        addTerminalLine(`$ Authenticating: ${code.replace(/./g, '*')}`);
-        addTerminalLine("$ Running validation checks...");
-        
-        try {
-            const res = await fetch("/api/stash", {  // Changed from "/api/stash/route" to "/api/stash"
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ name: code })
-            });
-            
-            console.log("Response status:", res.status);
-            console.log("Response redirected:", res.redirected);
-            console.log("Response URL:", res.url);
-            
-            if (res.redirected) {
-                addTerminalLine("$ Authentication successful");
-                addTerminalLine("$ Granting access...");
-                setTimeout(() => {
-                    window.location.href = res.url;
-                }, 1500);
-                return;
+    useEffect(() => {
+        focusInput();
+    }, []);
+
+    const addLines = (lines: string[]) => {
+        setTerminalLines(prev => [...prev, ...lines]);
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === "ArrowUp") {
+            e.preventDefault();
+            if (commandHistory.length === 0) return;
+            const newIndex = historyIndex === -1 ? commandHistory.length - 1 : Math.max(0, historyIndex - 1);
+            setHistoryIndex(newIndex);
+            setInput(commandHistory[newIndex]);
+        } else if (e.key === "ArrowDown") {
+            e.preventDefault();
+            if (historyIndex === -1) return;
+            if (historyIndex === commandHistory.length - 1) {
+                setHistoryIndex(-1);
+                setInput("");
+            } else {
+                const newIndex = historyIndex + 1;
+                setHistoryIndex(newIndex);
+                setInput(commandHistory[newIndex]);
             }
-            
-            // Handle error responses
-            if (!res.ok) {
-                addTerminalLine("$ Authentication failed");
-                addTerminalLine("$ Access denied");
-                
-                const contentType = res.headers.get('content-type');
-                if (contentType && contentType.includes('application/json')) {
-                    const errorData = await res.json();
-                    setError(errorData.error || "Invalid code.");
-                } else {
-                    setError("Invalid code.");
-                }
-            }
-        } catch (error) {
-            addTerminalLine("$ Connection error");
-            console.error("Network error:", error);
-            setError("Network error.");
         }
-        
-        setLoading(false);
+    };
+
+    const executeCommand = async (cmdString: string) => {
+        const trimmed = cmdString.trim();
+        if (!trimmed) return;
+
+        // Save command to history
+        setCommandHistory(prev => [...prev.filter(c => c !== trimmed), trimmed]);
+        setHistoryIndex(-1);
+
+        addLines([`$ ${trimmed}`]);
+
+        const parts = trimmed.split(/\s+/);
+        const command = parts[0].toLowerCase();
+        const args = parts.slice(1);
+
+        switch (command) {
+            case "help":
+                addLines([
+                    "Available Commands:",
+                    "  help             Show this reference guide",
+                    "  about            Print bio and overview of Nicholas",
+                    "  skills           Print technical skill matrices",
+                    "  drone            Print FPV telemetry and hangar specs",
+                    "  access <code>    Authenticate and redirect to secure stash",
+                    "  clear            Clear terminal display buffers"
+                ]);
+                break;
+            case "about":
+                addLines([
+                    "Nicholas | Software Engineer & Robotics Developer",
+                    "--------------------------------------------------",
+                    "Location: Ontario, Canada",
+                    "Interests: Full-Stack Engineering, Controls Systems (FRC), FPV Drone Design",
+                    "Focus: Creating robust Web applications, debugging embedded electronics,",
+                    "       and writing clean, low-latency control software.",
+                    "Attending high school, active member of FRC Controls Team 4308."
+                ]);
+                break;
+            case "skills":
+                addLines([
+                    "Technical Skill Matrix",
+                    "--------------------------------------------------",
+                    "Languages:      TypeScript, JavaScript, Python, Java, HTML/CSS",
+                    "Frameworks:     Next.js, React, Node.js, Tailwind CSS",
+                    "Robotics/Emb:   WPILib (FRC), Inverse Kinematics, Arduino",
+                    "Dev Tools:      Docker, VS Code, Git/GitHub, Blender, Figma",
+                    "Flight Systems: Betaflight, ExpressLRS, Analog VTX setups"
+                ]);
+                break;
+            case "drone":
+                addLines([
+                    "FPV Quadcopter Telemetry: 5\" Freebird Freestyle",
+                    "--------------------------------------------------",
+                    "Frame:          TBS Source One V5 (Carbon Fiber)",
+                    "Flight Controller/ESC: SpeedyBee F405 V3 Stack",
+                    "Motors:         T-MOTOR Velox V3.0 (2207 - 1950KV)",
+                    "Protocol:       ExpressLRS (ELRS) 2.4GHz Link",
+                    "FPV Feed:       Analog VTX w/ BetaFPV VR03 Ground Recorder",
+                    "Props:          Gemfan Hurricane 51466 Tri-blades",
+                    "Battery:        4S / 6S LiPo (Voltage: ~15.2V - 22.8V)",
+                    "Status:         Disarmed (Calibrated & Standby)"
+                ]);
+                break;
+            case "clear":
+                setTerminalLines([]);
+                break;
+            case "access":
+            case "login":
+                if (args.length === 0) {
+                    addLines(["Error: Access code required. Usage: access <code>"]);
+                    break;
+                }
+                const code = args.join(" ");
+                setLoading(true);
+                addLines(["Authenticating credentials..."]);
+
+                try {
+                    const res = await fetch("/api/stash", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ name: code })
+                    });
+
+                    if (res.redirected) {
+                        addLines(["Success: Access granted. Redirecting..."]);
+                        setTimeout(() => {
+                            window.location.href = res.url;
+                        }, 1000);
+                        return;
+                    }
+
+                    if (!res.ok) {
+                        addLines(["Access Denied: Invalid credentials."]);
+                    }
+                } catch {
+                    addLines(["Network Error: Connection failed."]);
+                } finally {
+                    setLoading(false);
+                }
+                break;
+            default:
+                addLines([`Command not found: '${command}'. Type 'help' for assistance.`]);
+                break;
+        }
+    };
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (loading) return;
+        const cmd = input;
+        setInput("");
+        executeCommand(cmd);
     };
 
     return (
-        <div className="min-h-screen bg-black text-green-500 font-mono flex items-center justify-center p-4 overflow-hidden">
-            {/* Matrix-like background effect */}
-            <div className="absolute inset-0 overflow-hidden opacity-20 pointer-events-none">
-                <div className="matrix-rain" />
-            </div>
-            
-            {/* Terminal window */}
-            <div className="w-full max-w-2xl border border-green-500 rounded-md bg-black bg-opacity-80 backdrop-blur-sm overflow-hidden shadow-[0_0_20px_rgba(0,255,0,0.3)]">
-                {/* Terminal header */}
-                <div className="flex items-center px-4 py-2 bg-black border-b border-green-800">
-                    <div className="flex space-x-2">
-                        <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                        <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                        <div className="w-3 h-3 rounded-full bg-green-500"></div>
+        <main className="min-h-screen bg-[#080808] text-neutral-300 font-mono flex flex-col relative">
+            <Navbar />
+            <div className="flex-1 flex flex-col items-center justify-center p-4 pt-24 pb-12 z-10 w-full max-w-4xl mx-auto">
+                <div 
+                    onClick={focusInput}
+                    className="w-full flex-1 min-h-[450px] bg-[#0c0c0c] border border-neutral-800 rounded-lg flex flex-col overflow-hidden shadow-2xl cursor-text"
+                >
+                    {/* Terminal Window Title Bar */}
+                    <div className="flex items-center justify-between px-4 py-2 border-b border-neutral-900 bg-[#0f0f0f] select-none">
+                        <div className="flex space-x-2">
+                            <span className="w-2.5 h-2.5 rounded-full bg-neutral-800" />
+                            <span className="w-2.5 h-2.5 rounded-full bg-neutral-800" />
+                            <span className="w-2.5 h-2.5 rounded-full bg-neutral-800" />
+                        </div>
+                        <span className="text-[10px] text-neutral-500 uppercase tracking-widest font-sans">developer_terminal</span>
+                        <div className="w-12"></div>
                     </div>
-                    <div className="mx-auto text-xs text-center text-green-400 tracking-widest">SECURE-ACCESS-TERMINAL</div>
-                </div>
-                
-                {/* Terminal body */}
-                <div className="p-6 bg-black bg-opacity-80">
-                    {/* Terminal output */}
-                    <div className="mb-8 text-sm">
-                        {terminalLines.map((line, index) => (
-                            <div key={index} className="mb-1 typing-animation">
+
+                    {/* Terminal Window Content Buffer */}
+                    <div 
+                        ref={containerRef}
+                        className="flex-1 p-6 overflow-y-auto space-y-1 text-sm leading-relaxed max-h-[500px]"
+                    >
+                        {terminalLines.map((line, idx) => (
+                            <div key={idx} className="whitespace-pre-wrap">
                                 {line}
                             </div>
                         ))}
                     </div>
-                    
-                    {/* Input form */}
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                        <div className="flex items-center">
-                            <span className="text-green-400 mr-2">$</span>
-                            <input
-                                type="text"
-                                value={code}
-                                onChange={e => setCode(e.target.value)}
-                                className="flex-1 bg-transparent border-b border-green-500 text-green-400 px-2 py-1 focus:outline-none focus:border-green-300 tracking-wider"
-                                placeholder="Enter access code"
-                                autoFocus
-                                disabled={loading}
-                                spellCheck="false"
-                                autoComplete="off"
-                            />
-                        </div>
-                        
-                        <div className="space-y-3">
-                            <button
-                                type="submit"
-                                disabled={loading}
-                                className="w-full border border-green-500 hover:bg-green-500 hover:bg-opacity-20 transition-all duration-300 text-green-400 py-2 px-4 tracking-widest"
-                            >
-                                {loading ? 'PROCESSING...' : 'AUTHENTICATE'}
-                            </button>
-                            
-                            {error && (
-                                <div className="text-red-500 text-sm text-center animate-pulse">
-                                    {error}
-                                </div>
-                            )}
-                        </div>
+
+                    {/* Terminal Prompt Bar */}
+                    <form 
+                        onSubmit={handleSubmit}
+                        className="flex items-center px-6 py-4 border-t border-neutral-900 bg-[#0a0a0a]"
+                    >
+                        <span className="text-neutral-500 mr-2 select-none">$</span>
+                        <input
+                            ref={inputRef}
+                            type="text"
+                            value={input}
+                            onChange={e => setInput(e.target.value)}
+                            onKeyDown={handleKeyDown}
+                            className="flex-grow bg-transparent text-neutral-200 border-none outline-none focus:ring-0 p-0 text-sm"
+                            placeholder={loading ? "System processing..." : "Type command..."}
+                            disabled={loading}
+                            autoComplete="off"
+                            spellCheck="false"
+                            autoFocus
+                        />
                     </form>
-                    
-                    {/* Terminal footer */}
-                    <div className="mt-6 pt-4 border-t border-green-900 text-xs text-green-700 flex justify-between">
-                        <span>[SYS:ACTIVE]</span>
-                        <span>|SECURE|</span>
-                        <span className="animate-pulse">[STANDBY]</span>
-                    </div>
                 </div>
             </div>
-            
-            {/* CSS for matrix rain effect */}
-            <style jsx>{`
-                .matrix-rain {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    bottom: 0;
-                    background: linear-gradient(0deg, 
-                        rgba(0, 255, 0, 0.1) 25%, 
-                        rgba(0, 0, 0, 0) 100%),
-                        repeating-linear-gradient(0deg, transparent 0px, 
-                        rgba(0, 255, 0, 0.05) 1px, transparent 2px, 
-                        transparent 20px);
-                    animation: scroll 10s linear infinite;
-                }
-
-                @keyframes scroll {
-                    0% { background-position: 0 0; }
-                    100% { background-position: 0 1000px; }
-                }
-                
-                .typing-animation {
-                    overflow: hidden;
-                    border-right: 2px solid transparent;
-                    white-space: nowrap;
-                    animation: typing 0.5s steps(30, end);
-                }
-                
-                @keyframes typing {
-                    from { width: 0 }
-                    to { width: 100% }
-                }
-            `}</style>
-        </div>
+        </main>
     );
 }

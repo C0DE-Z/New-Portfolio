@@ -30,8 +30,8 @@ export async function POST(request: NextRequest) {
                         return NextResponse.redirect(new URL(redirectUrl), { status: 302 });
         }
 
-        console.log("Invalid code, returning 404");
-        return NextResponse.json({ error: 'Invalid code' }, { status: 404 });
+        console.log("Invalid code, returning 401");
+        return NextResponse.json({ error: 'Invalid code' }, { status: 401 });
     } catch (error) {
         console.error("Error processing request:", error);
         return NextResponse.json({ error: 'Invalid request' }, { status: 400 });

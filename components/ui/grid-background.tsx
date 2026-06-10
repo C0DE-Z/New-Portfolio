@@ -1,9 +1,10 @@
+"use client"
 import { motion } from 'framer-motion'; // Import Framer Motion
 
 export default function GridBackground() {
   return (
 <motion.div
-          className="absolute inset-0"
+          className="absolute inset-0 -z-10"
           style={{
             backgroundSize: '40px 40px',
             backgroundImage: `

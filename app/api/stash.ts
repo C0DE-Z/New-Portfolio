@@ -28,8 +28,8 @@ export async function POST(request: NextRequest) {
             }
         }
 
-        console.log("Invalid code, returning 404");
-        return NextResponse.json({ error: 'Invalid code' }, { status: 404 });
+        console.log("Invalid code, returning 401");
+        return NextResponse.json({ error: 'Invalid code' }, { status: 401 });
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
         return NextResponse.json({ error: 'Invalid request' }, { status: 400 });

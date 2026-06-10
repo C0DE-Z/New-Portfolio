@@ -6,7 +6,7 @@ export default function Footer() {
         <footer className="flex gap-6 flex-wrap items-center justify-center pb-[4.5rem]">
               <FooterLink href="#about" icon={FaInfoCircle} text="About" />
               <FooterLink href="#projects" icon={FaProjectDiagram} text="Projects" />
-              <FooterLink href="https://github.com/C0DE-Zs" icon={FaGithub} text="Source Code" />
+              <FooterLink href="https://github.com/C0DE-Z" icon={FaGithub} text="Source Code" />
         </footer>
     </footer>
   );

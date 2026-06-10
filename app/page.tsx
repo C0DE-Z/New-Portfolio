@@ -1,25 +1,20 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client"
 import { useEffect, useRef, useState } from "react";
-import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { motion } from 'framer-motion';
 
 import React from "react";
 import Footer from "../components/footer";
-import GridBackground from "../components/ui/grid-backround";
+import GridBackground from "../components/ui/grid-background";
 import Projects from "../components/projects";
 import Hero from "../components/hero";
 import About from "../components/about";
 import Contact from "../components/contact";
+import Navbar from "../components/Navbar";
+import Experience from "../components/experience";
 
 export default function Home() {
   
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const idleTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const orbitAngleRef = useRef(0);
   const sectionRefs = useRef<HTMLDivElement[]>([]);
   const footerRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(true);
@@ -34,96 +29,16 @@ export default function Home() {
     }
   }, []);
 
-  useEffect(() => {
-    if (canvasRef.current) {
-
-      // Render the 3d model
-      const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(75, window.innerWidth / 2 / window.innerHeight, 0.1, 1000);
-      const renderer = new THREE.WebGLRenderer({ canvas: canvasRef.current, alpha: true });
-      renderer.setSize(window.innerWidth / 2, window.innerHeight); 
-      renderer.setClearColor(0x000000, 0);
-      const controls = new OrbitControls(camera, renderer.domElement);
-      controls.enableDamping = true;
-      // Min and Max distance for scroll (Currently Locked)
-      controls.minDistance = 0; 
-      controls.maxDistance = 300;
-      
-      const loader = new GLTFLoader();
-      const dracoLoader = new DRACOLoader();
-      dracoLoader.setDecoderPath('/draco/'); 
-      loader.setDRACOLoader(dracoLoader);
-
-      loader.load('/models/fpv-drone/fpv.gltf', (gltf: { scene: THREE.Object3D<THREE.Object3DEventMap>; }) => {
-        gltf.scene.traverse((child) => {
-          if (child instanceof THREE.Mesh) {
-            if (child.material.map) {
-              child.material.map.needsUpdate = true;
-            }
-    
-          }
-        });
-        scene.add(gltf.scene);
-        setTimeout(() => setLoading(false), 1000);
-      }, undefined, (error) => {
-        console.error('An error occurred while loading the model:', error);
-        setLoading(false); // Stop loading on error
-      });
-
-      // Starting zoom
-      camera.position.z = 300;
-
-      const pointLight = new THREE.PointLight(0xffffff, 50); // Add point light
-      pointLight.position.set(0, 0, 10); 
-      scene.add(pointLight);
-
-      const animate = function () {
-        requestAnimationFrame(animate);
-        controls.update();
-        renderer.render(scene, camera);
-
-        if (!controls.enabled) {
-          orbitAngleRef.current += 0.001;
-          camera.position.x = 300 * Math.sin(orbitAngleRef.current);
-          camera.position.z = 300 * Math.cos(orbitAngleRef.current);
-          camera.lookAt(scene.position);
-        }
-      };
-
-      // Start spinning after a timeout
-      const resetIdleTimeout = () => {
-        if (idleTimeoutRef.current) {
-          clearTimeout(idleTimeoutRef.current);
-        }
-        controls.enabled = true;
-        idleTimeoutRef.current = setTimeout(() => {
-          controls.enabled = false;
-        }, 1500); 
-      };
-
-      window.addEventListener('mousemove', resetIdleTimeout);
-      window.addEventListener('mousedown', resetIdleTimeout);
-      window.addEventListener('touchstart', resetIdleTimeout);
-      
-      animate();
-      resetIdleTimeout();
-
-      return () => {
-        window.removeEventListener('mousemove', resetIdleTimeout);
-        window.removeEventListener('mousedown', resetIdleTimeout);
-        window.removeEventListener('touchstart', resetIdleTimeout);
-      };
-    }
-  }, []);
-
   useEffect(() => { // Hide the footer on scroll
     const handleScroll = () => {
       if (footerRef.current) {
         if (window.scrollY > 60) {
           footerRef.current.style.opacity = '0';
+          footerRef.current.style.pointerEvents = 'none';
           footerRef.current.style.transition = 'opacity 0.1s';
         } else {
           footerRef.current.style.opacity = '1';
+          footerRef.current.style.pointerEvents = 'auto';
           footerRef.current.style.transition = 'opacity 0.1s';
         }
       }
@@ -166,12 +81,17 @@ export default function Home() {
         animate={{ opacity: loading ? 0 : 1 }}
         transition={{ duration: 0.5 }}
       >
+        <Navbar />
         <section id="hero" className="relative min-h-[75vh]">
-          <Hero canvasRef={canvasRef} />
+          <Hero onLoadComplete={() => setLoading(false)} />
         </section>
         <section id="about" className="relative min-h-[25vh]">
           <GridBackground />
           <About />
+        </section>
+        <section id="experience" className="relative min-h-[50vh]">
+          <GridBackground />
+          <Experience />
         </section>
         <section id="projects" className="relative min-h-[75vh]">
           <GridBackground />
