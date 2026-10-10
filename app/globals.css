@@ -74,7 +74,7 @@
   height: 100vh;
 }
 
-.field { z-index: 0; }
+.field { z-index: 0; pointer-events: auto; }
 .wipe { z-index: 50; pointer-events: none; }
 
 .center {
@@ -179,4 +179,3 @@ body { background: #111111; }
 .dash-out { background: none; border: 0; color: #555555; font: inherit; cursor: pointer; padding: 0; text-align: left; }
 .dash-list button:hover,
 .dash-out:hover { color: #b0b0b0; }
-

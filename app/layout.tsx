@@ -16,7 +16,7 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   title: "Code-Z",
-  description: "human ",
+  description: "developer ",
   keywords: ["Code-Z", "Software", "Open Source","Code","Nick"],
   openGraph: {
     title: "Code-Z",

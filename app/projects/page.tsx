@@ -2,9 +2,11 @@ import { WipeReveal, WipeLink } from "../wipe";
 
 const projects = [
   { name: "absolute lib", href: "https://github.com/Team4308/absolutelib" },
-  { name: "z", href: "https://github.com/C0DE-Z/Z" },
+  { name: "z", href: "https://z.codezey.dev" },
   { name: "ecstasis", href: "https://github.com/C0DE-Z/Ecstasis" },
+  { name: "loud", href: "https://github.com/C0DE-Z/loud" },
 ];
+
 
 export const metadata = { title: "Code-Z | Projects" };
 

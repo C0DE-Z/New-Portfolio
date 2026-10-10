@@ -10,7 +10,7 @@ export default function Home() {
         <nav className="links">
           <WipeLink href="/projects">things</WipeLink>
           <WipeLink href="/contact">social</WipeLink>
-          <WipeLink href="/code">code</WipeLink>
+          <WipeLink href="/code">words</WipeLink>
         </nav>
       </div>
     </main>

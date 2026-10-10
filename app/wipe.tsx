@@ -25,7 +25,7 @@ function runWipe(canvas: HTMLCanvasElement, mode: "cover" | "reveal", done?: () 
     ctx.textBaseline = "top";
     const edge = p * (cols + 12);
     for (let x = 0; x < cols; x++) {
-      const dist = mode === "cover" ? edge - x : edge - (cols - 1 - x);
+      const dist = edge - x;
       const covered = mode === "cover" ? dist > 0 : dist < 0;
       const onEdge = Math.abs(dist) <= 12;
       if (!covered && !onEdge) continue;
@@ -37,6 +37,7 @@ function runWipe(canvas: HTMLCanvasElement, mode: "cover" | "reveal", done?: () 
         ctx.fillText(GLYPHS[Math.floor(Math.random() * GLYPHS.length)], x * CELL_W, y * CELL_H);
       }
     }
+    canvas.style.background = "transparent";
     if (p < 1) requestAnimationFrame(step);
     else done?.();
   };
@@ -53,7 +54,7 @@ export function WipeReveal() {
       canvas.style.display = "none";
     }));
   }, []);
-  return <canvas ref={ref} className="wipe" aria-hidden="true" />;
+  return <canvas ref={ref} className="wipe" style={{ background: "#111111" }} aria-hidden="true" />;
 }
 
 export function WipeLink({

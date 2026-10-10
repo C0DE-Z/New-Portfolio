@@ -41,6 +41,10 @@ export default function CodePage() {
           go(`/blog/${data.id}`);
           return;
         }
+        if (data.type === "page") {
+          go(data.path);
+          return;
+        }
         if (data.type === "link") {
           window.location.href = data.url;
           return;
@@ -101,5 +105,4 @@ export default function CodePage() {
     </main>
   );
 }
-
 
