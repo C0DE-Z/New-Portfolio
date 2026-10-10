@@ -1,3 +1,4 @@
+import AsciiField from "./ascii-field";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
@@ -14,13 +15,16 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Nicholas Portfolio | Full Stack Developer",
-  description: "Portfolio of Nicholas, a Full Stack Web Developer and Robotics Enthusiast. View my projects, skills, and contact information.",
-  keywords: ["Portfolio", "Full Stack Developer", "Robotics", "Web Development", "Next.js", "React", "Three.js"],
+  title: "Code-Z",
+  description: "human ",
+  keywords: ["Code-Z", "Software", "Open Source","Code","Nick"],
   openGraph: {
-    title: "Nicholas Portfolio",
-    description: "Full Stack Web Developer and Robotics Enthusiast",
+    title: "Code-Z",
+    description: "human",
     type: "website",
+  },
+  other: {
+    "theme-color": "#111111",
   },
 };
 
@@ -34,6 +38,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-x-hidden`}
       >
+        <AsciiField />
         {children}
       </body>
     </html>

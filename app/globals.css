@@ -1,33 +1,39 @@
+@font-face {
+  font-family: "NerdMono";
+  src: url("/fonts/3270NerdFontMono-Regular.ttf") format("truetype");
+  font-display: swap;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --background: 0 0% 6.7%;
+    --foreground: 0 0% 93%;
+    --card: 0 0% 8%;
+    --card-foreground: 0 0% 93%;
+    --popover: 0 0% 8%;
+    --popover-foreground: 0 0% 93%;
+    --primary: 0 0% 60%;
+    --primary-foreground: 0 0% 7%;
+    --secondary: 0 0% 13.3%;
+    --secondary-foreground: 0 0% 93%;
+    --muted: 0 0% 13.3%;
+    --muted-foreground: 0 0% 58%;
+    --accent: 0 0% 13.3%;
+    --accent-foreground: 0 0% 93%;
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+    --destructive-foreground: 0 0% 93%;
+    --border: 0 0% 17%;
+    --input: 0 0% 13.3%;
+    --ring: 0 0% 40%;
+    --chart-1: 0 0% 70%;
+    --chart-2: 0 0% 58%;
+    --chart-3: 0 0% 40%;
+    --chart-4: 0 0% 50%;
+    --chart-5: 0 0% 75%;
     --radius: 0.5rem;
   }
 }
@@ -36,7 +42,141 @@
   * {
     @apply border-border;
   }
+  html {
+    scroll-behavior: smooth;
+  }
   body {
     @apply bg-background text-foreground;
   }
+  ::selection {
+    background-color: #333333;
+    color: #f3f3f3;
+  }
 }
+
+.screen {
+  position: relative;
+  display: flex;
+  min-height: 100svh;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: transparent;
+  color: #9a9a9a;
+  font-family: "NerdMono", "3270 Nerd Font Mono", Consolas, monospace;
+}
+
+.field,
+.wipe {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+}
+
+.field { z-index: 0; }
+.wipe { z-index: 50; pointer-events: none; }
+
+.center {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.5rem 2rem;
+  background: #111111;
+}
+
+.center h1 {
+  margin: 0;
+  color: #b0b0b0;
+  font-size: 2rem;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+}
+
+.links { display: flex; gap: 2.5rem; font-size: 1.15rem; letter-spacing: 0.05em; }
+
+.screen a {
+  color: #777777;
+  text-decoration: none;
+}
+
+.screen a::before { content: "\f054  "; color: #444444; }
+.screen a.button::before,
+.screen a.back::before { content: ""; }
+.screen a:hover,
+.screen a:focus-visible { color: #b0b0b0; outline: none; }
+
+.list { align-items: flex-start; min-width: min(22rem, 90vw); }
+.prompt { margin: 0; color: #555555; font-size: 1.05rem; }
+.list ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 0.6rem; }
+.list li { font-size: 1.15rem; }
+.list li::before { content: "\f07b  "; color: #555555; }
+.list li a::before { content: ""; }
+
+.button {
+  padding: 0.35rem 0.8rem;
+  background: #222222;
+  border: 1px solid #333333;
+  text-decoration: none !important;
+}
+
+.back { font-size: 0.85rem; }
+
+body { background: #111111; }
+.center { background: transparent; }
+
+.list.contact li::before { content: "\f054  "; }
+
+.center { padding: 2rem 3rem; background: rgba(17, 17, 17, 0.88); }
+
+
+.name { display: inline-block; cursor: default; text-align: left; }
+
+
+.entry { position: relative; min-height: 2.2rem; font-size: 1.6rem; color: #cfcfcf; letter-spacing: 0.08em; word-break: break-all; }
+.entry-text { white-space: pre-wrap; }
+.entry-cursor { color: #777777; animation: blink 1s steps(1) infinite; }
+.entry-input { position: absolute; inset: 0; width: 100%; opacity: 0; border: 0; background: transparent; color: transparent; caret-color: transparent; }
+.entry-status { color: #777777; min-height: 1.4rem; margin: 0.5rem 0 1.2rem; }
+@keyframes blink { 50% { opacity: 0; } }
+
+.doc { text-align: left; max-width: 44rem; margin: 0 auto 1.5rem; }
+.doc-body { white-space: pre-wrap; max-height: 50vh; overflow-y: auto; line-height: 1.6; color: #bdbdbd; }
+
+.empty { color: #555555; }
+.post { width: min(44rem, 92vw); align-items: stretch; max-height: 92svh; overflow-y: auto; }
+.post-date { margin: 0; color: #555555; font-size: 0.85rem; }
+.post-media { max-width: 100%; max-height: 60vh; background: #111111; border: 1px solid #222222; }
+.post-audio { width: 100%; filter: grayscale(1); }
+
+.dash { width: min(40rem, 92vw); align-items: stretch; max-height: 94svh; overflow-y: auto; }
+.dash-form { display: grid; gap: 0.7rem; }
+.dash-form input[type="text"],
+.dash-form input:not([type]),
+.dash-form textarea {
+  width: 100%;
+  padding: 0.5rem 0.7rem;
+  background: #161616;
+  border: 1px solid #2a2a2a;
+  color: #cfcfcf;
+  font: inherit;
+  outline: none;
+  resize: vertical;
+}
+.dash-form input:focus,
+.dash-form textarea:focus { border-color: #444444; }
+.dash-file { display: block; padding: 0.5rem 0.7rem; border: 1px dashed #333333; color: #777777; cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dash-file input { display: none; }
+.dash-form .button { justify-self: start; color: #9a9a9a; font: inherit; cursor: pointer; }
+.dash-form .button:disabled { opacity: 0.5; }
+.dash-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 0.5rem; }
+.dash-list li { display: flex; justify-content: space-between; gap: 1rem; white-space: pre; }
+.dash-list li a::before { content: ""; }
+.dash-list button,
+.dash-out { background: none; border: 0; color: #555555; font: inherit; cursor: pointer; padding: 0; text-align: left; }
+.dash-list button:hover,
+.dash-out:hover { color: #b0b0b0; }
+

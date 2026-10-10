@@ -1,0 +1,25 @@
+import { Pool } from "pg";
+
+const globalForDb = globalThis as unknown as { pool?: Pool; ready?: Promise<unknown> };
+
+export const pool = (globalForDb.pool ??= new Pool({ connectionString: process.env.DATABASE_URL, max: 3 }));
+
+export function ready() {
+  return (globalForDb.ready ??= (async () => {
+    await pool.query(
+      "CREATE TABLE IF NOT EXISTS codes (id TEXT PRIMARY KEY, salt TEXT NOT NULL, hash TEXT NOT NULL, type TEXT NOT NULL, url TEXT, title TEXT, body TEXT)"
+    );
+    await pool.query(
+      "CREATE TABLE IF NOT EXISTS posts (id UUID PRIMARY KEY DEFAULT gen_random_uuid(), title TEXT NOT NULL, body TEXT NOT NULL DEFAULT '', created_at TIMESTAMPTZ NOT NULL DEFAULT now())"
+    );
+    await pool.query("ALTER TABLE posts ADD COLUMN IF NOT EXISTS salt TEXT");
+    await pool.query("ALTER TABLE posts ADD COLUMN IF NOT EXISTS hash TEXT");
+    await pool.query(
+      "CREATE TABLE IF NOT EXISTS media (id UUID PRIMARY KEY DEFAULT gen_random_uuid(), post_id UUID NOT NULL, name TEXT NOT NULL, mime TEXT NOT NULL, size INT NOT NULL, data BYTEA NOT NULL, created_at TIMESTAMPTZ NOT NULL DEFAULT now(), INDEX (post_id))"
+    );
+  })());
+}
+
+export type Post = { id: string; title: string; body: string; created_at: Date };
+export type Media = { id: string; post_id: string; name: string; mime: string; size: number };
+
