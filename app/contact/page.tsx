@@ -14,9 +14,15 @@ export default function Contact() {
           </li>
           <li>
             <a href="https://github.com/C0DE-Z" target="_blank" rel="noopener noreferrer">
-              github.com/C0DE-Z
+              github
             </a>
           </li>
+          <li>
+            <a href="https://leetcode.com/u/C0DE-Z/" target="_blank" rel="noopener noreferrer">
+              leetcode
+            </a>
+          </li>
+
         </ul>
         <WipeLink href="/" className="back">
           &lt; back
