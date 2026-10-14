@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { WipeReveal, WipeLink, useWipeNav } from "../wipe";
+import { WipeReveal, WipeLink, useWipeNav } from "@/app/components/wipe";
 
 export default function CodePage() {
   const [value, setValue] = useState("");
@@ -17,13 +17,17 @@ export default function CodePage() {
   const slowDownMessages = ["slow down", "take it easy", "calma", "wait"];
   const deniedMessages = ["if you're lost it's okay", "try help", "I don't think so", "it's okay to be wrong", "don't worry",
      "my back is killing me", "don't lose hope", "try another code", "listen to black midi there pretty cool", "have you ever thought about whats next? nah me neither", 
-     "Stop smoking, we love you", "why", "do you think about the current economical state of the world? no me neither.", "i cant sleep, can you?" ];
+     "stop smoking, we love you", "why", "do you think about the current economical state of the world? no me neither.", "i cant sleep, can you?", "try trip" ];
 
      
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     const code = value.trim();
     if (!code || busy) return;
+    if (code.toLowerCase() === "trip") {
+      go("/trip");
+      return;
+    }
     if (code.toLowerCase() === "login") {
       go("/login");
       return;

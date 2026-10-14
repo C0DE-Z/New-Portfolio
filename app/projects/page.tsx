@@ -1,27 +1,34 @@
-import { WipeReveal, WipeLink } from "../wipe";
+import { WipeReveal, WipeLink } from "@/app/components/wipe";
+import { pool, ready, type Project } from "@/app/lib/db";
+import FileOpen from "@/app/components/file-open";
 
-const projects = [
-  { name: "absolute lib", href: "https://github.com/Team4308/absolutelib" },
-  { name: "z", href: "https://z.codezey.dev" },
-  { name: "ecstasis", href: "https://github.com/C0DE-Z/Ecstasis" },
-  { name: "loud", href: "https://github.com/C0DE-Z/loud" },
-];
-
-
+export const dynamic = "force-dynamic";
 export const metadata = { title: "Code-Z | Projects" };
 
-export default function Projects() {
+async function load() {
+  try {
+    await ready();
+    return (await pool.query("SELECT slug, name, summary FROM projects ORDER BY created_at DESC")).rows as Pick<
+      Project,
+      "slug" | "name" | "summary"
+    >[];
+  } catch {
+    return [];
+  }
+}
+
+export default async function Projects() {
+  const rows = await load();
   return (
     <main className="screen">
       <WipeReveal />
       <div className="center list">
         <p className="prompt">things</p>
         <ul>
-          {projects.map((p) => (
-            <li key={p.name}>
-              <a href={p.href} target="_blank" rel="noopener noreferrer">
-                {p.name}
-              </a>
+          {rows.map((p) => (
+            <li key={p.slug} className="file">
+              <FileOpen href={`/projects/${p.slug}`} name={p.name} />
+              {p.summary && <small>{p.summary}</small>}
             </li>
           ))}
         </ul>

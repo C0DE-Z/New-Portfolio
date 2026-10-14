@@ -1,5 +1,5 @@
-import Scramble from "./scramble";
-import { WipeLink, WipeReveal } from "./wipe";
+import Scramble from "@/app/components/scramble";
+import { WipeLink, WipeReveal } from "@/app/components/wipe";
 
 export default function Home() {
   return (

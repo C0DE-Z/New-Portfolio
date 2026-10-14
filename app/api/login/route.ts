@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { checkPassword, cookieOptions, makeToken } from "../../auth";
-import { clientIp, limited } from "../../limit";
+import { checkPassword, cookieOptions, makeToken } from "@/app/lib/auth";
+import { clientIp, limited } from "@/app/lib/limit";
 
 export const runtime = "nodejs";
 

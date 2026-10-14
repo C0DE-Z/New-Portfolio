@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { scryptSync, timingSafeEqual } from "node:crypto";
-import { pool, ready } from "../../db";
+import { pool, ready } from "@/app/lib/db";
 
 export const runtime = "nodejs";
 

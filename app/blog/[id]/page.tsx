@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
-import { WipeReveal, WipeLink } from "../../wipe";
-import { pool, ready, type Media, type Post } from "../../db";
+import { WipeReveal, WipeLink } from "@/app/components/wipe";
+import { pool, ready, type Media, type Post } from "@/app/lib/db";
 
 export const dynamic = "force-dynamic";
 

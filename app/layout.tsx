@@ -1,4 +1,4 @@
-import AsciiField from "./ascii-field";
+import AsciiField from "@/app/components/ascii-field";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";

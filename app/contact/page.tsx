@@ -1,4 +1,4 @@
-import { WipeReveal, WipeLink } from "../wipe";
+import { WipeReveal, WipeLink } from "@/app/components/wipe";
 
 export const metadata = { title: "Code-Z | Contact" };
 

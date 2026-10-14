@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isAdmin } from "../../auth";
+import { isAdmin } from "@/app/lib/auth";
 import { randomBytes, scryptSync } from "node:crypto";
-import { pool, ready } from "../../db";
+import { pool, ready } from "@/app/lib/db";
 
 export const runtime = "nodejs";
 

@@ -179,3 +179,43 @@ body { background: #111111; }
 .dash-out { background: none; border: 0; color: #555555; font: inherit; cursor: pointer; padding: 0; text-align: left; }
 .dash-list button:hover,
 .dash-out:hover { color: #b0b0b0; }
+
+/* projects / markdown */
+.file { display: grid; grid-template-columns: auto 1fr; column-gap: 0.6rem; align-items: baseline; }
+.file::before { grid-row: 1; }
+.file small { grid-column: 2; }
+.file small { opacity: 0.55; font-size: 0.75em; }
+.proj-summary { opacity: 0.7; margin: 0 0 0.75rem; }
+.md { line-height: 1.6; overflow-wrap: anywhere; }
+.md h1, .md h2, .md h3 { margin: 1rem 0 0.4rem; font-weight: 600; }
+.md p { margin: 0.5rem 0; }
+.md ul, .md ol { margin: 0.5rem 0 0.5rem 1.25rem; list-style: revert; }
+.md code { background: rgba(255,255,255,0.08); padding: 0 0.3em; }
+.md pre { background: rgba(255,255,255,0.06); padding: 0.6rem; overflow-x: auto; margin: 0.6rem 0; }
+.md pre code { background: none; padding: 0; }
+.md img { max-width: 100%; margin: 0.5rem 0; }
+.md blockquote { border-left: 2px solid #555; padding-left: 0.75rem; opacity: 0.8; }
+.devlog { margin-top: 1.5rem; border-top: 1px solid #333; padding-top: 0.5rem; }
+.devlog article { margin: 0.9rem 0; }
+.dash-proj { flex-wrap: wrap; gap: 0.4rem; }
+.dash-proj textarea { width: 100%; }
+.file-open { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; background: rgba(17,17,17,0.85); }
+.file-win { border: 1px solid #777; background: #111; min-width: min(22rem, 90vw); transition: transform 60ms linear; }
+.file-title { display: flex; justify-content: space-between; padding: 0.25rem 0.6rem; background: #222; color: #aaa; border-bottom: 1px solid #777; }
+.file-win pre { padding: 0.8rem; margin: 0; color: #ddd; white-space: pre; }
+
+.center { transition: opacity 250ms ease; }
+.warping .center, .warping .back { opacity: 0 !important; pointer-events: none; }
+
+.dash-tabs { display: flex; gap: 1.2rem; border-bottom: 1px solid #222222; padding-bottom: 0.4rem; }
+.dash-tabs button { background: none; border: 0; color: #555555; font: inherit; cursor: pointer; padding: 0; }
+.dash-tabs button.on { color: #d0d0d0; }
+.dash-tabs button:hover { color: #b0b0b0; }
+.dash-card { display: grid; gap: 0.5rem; border: 1px solid #222222; padding: 0.7rem; }
+.dash-card header { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.dash-meta { color: #555555; font-size: 0.8em; }
+.dash-actions { display: flex; gap: 1rem; }
+.dash-card button { background: none; border: 0; color: #666666; font: inherit; cursor: pointer; padding: 0; }
+.dash-card button:hover { color: #b0b0b0; }
+.dash-card textarea, .dash-card input { width: 100%; background: transparent; border: 1px solid #222222; color: inherit; font: inherit; padding: 0.4rem 0.6rem; outline: none; }
+.dash-log { border-top: 1px dashed #222222; padding-top: 0.4rem; display: grid; gap: 0.3rem; white-space: pre-wrap; }

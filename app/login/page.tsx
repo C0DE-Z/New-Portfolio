@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { WipeReveal, WipeLink, useWipeNav } from "../wipe";
+import { WipeReveal, WipeLink, useWipeNav } from "@/app/components/wipe";
 
 export default function LoginPage() {
   const [value, setValue] = useState("");

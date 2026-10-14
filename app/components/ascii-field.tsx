@@ -6,6 +6,8 @@ const RAMP = " .'`,:;-~+=*#%@";
 const CELL_W = 10;
 const CELL_H = 18;
 const SHADES = Array.from({ length: 121 }, (_, i) => `rgb(${34 + i},${34 + i},${34 + i})`);
+const month = new Date().getMonth();
+
 
 type Shape = { ax: number; ay: number; fx: number; fy: number; amp: number; speed: number };
 
@@ -19,11 +21,30 @@ const SHAPES: Shape[] = [
 
 const PATHS: Record<string, number> = { "/": 0, "/projects": 1, "/contact": 2, "/code": 3 };
 
-function shapeFor(path: string) {
+function rngFor(path: string) {
+  let h = 1779033703 * month;
+  for (let i = 0; i < path.length; i++) h = Math.imul(h ^ path.charCodeAt(i), 3432918353) >>> 0;
+  let a = h;
+  return () => {
+    // Mulberry32 stolen 
+    a = (a + 0x6d2b79f5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function shapeFor(path: string): Shape {
   if (path in PATHS) return SHAPES[PATHS[path]];
-  let h = 0;
-  for (let i = 0; i < path.length; i++) h = (h * 31 + path.charCodeAt(i)) >>> 0;
-  return SHAPES[h % SHAPES.length];
+  const r = rngFor(path);
+  const sign = () => (r() < 0.5 ? -1 : 1);
+  return { ax: sign() * (0.3 + r() * 0.6), ay: sign() * (0.3 + r() * 0.6), fx: 5 + r() * 5, fy: 6 + r() * 6, amp: 0.8 + r() * 0.8, speed: 0.1 + r() * 0.05 };
+}
+
+function seedFor(path: string) {
+  const r = rngFor("seed:" + path);
+  return { a: r() * 6.28, b: r() * 6.28, c: r() * 6.28, n: r() * 100, jx: (r() - 0.5) * 0.2, jy: (r() - 0.5) * 0.2 };
 }
 
 export default function AsciiField() {
@@ -31,8 +52,13 @@ export default function AsciiField() {
   const pathname = usePathname();
   const target = useRef<Shape>(shapeFor(pathname));
 
+  const seedRef = useRef(seedFor(pathname));
+  const warp = useRef<{ dir: 'in' | 'out'; t0: number } | null>(null);
+
   useEffect(() => {
     target.current = shapeFor(pathname);
+    seedRef.current = seedFor(pathname);
+    if (warp.current?.dir === 'in') warp.current = { dir: 'out', t0: performance.now() };
   }, [pathname]);
 
   useEffect(() => {
@@ -45,9 +71,6 @@ export default function AsciiField() {
     let frame = 0;
     let alive = true;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    const seed = { a: Math.random() * 6.28, b: Math.random() * 6.28, c: Math.random() * 6.28, n: Math.random() * 100 };
-    const jitter = { ax: (Math.random() - 0.5) * 0.2, ay: (Math.random() - 0.5) * 0.2 };
     const cur: Shape = { ...target.current };
     let phase = Math.random() * 1.6;
     let last = performance.now();
@@ -62,6 +85,11 @@ export default function AsciiField() {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       cols = Math.ceil(window.innerWidth / CELL_W);
       rows = Math.ceil(window.innerHeight / CELL_H);
+    };
+
+    const onWarp = () => {
+      warp.current = { dir: 'in', t0: performance.now() };
+      document.documentElement.classList.add('warping');
     };
 
     const onDown = (e: PointerEvent) => {
@@ -91,6 +119,21 @@ export default function AsciiField() {
         return { x: r.x, y: r.y, radius: age * SPREAD, fade: Math.pow(1 - age / LIFE, 1.5) };
       });
 
+      let w = 0;
+      const wp = warp.current;
+      if (wp) {
+        const el = now - wp.t0;
+        if (wp.dir === "in") w = Math.min(1, el / 800);
+        else {
+          w = Math.max(0, 1 - el / 700);
+          if (w === 0) {
+            warp.current = null;
+            document.documentElement.classList.remove("warping");
+          }
+        }
+        w = w * w * (3 - 2 * w);
+      }
+
       ctx.fillStyle = "#111111";
       ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
       ctx.font = `${CELL_H - 4}px NerdMono, Consolas, monospace`;
@@ -98,8 +141,9 @@ export default function AsciiField() {
 
       const sweep = phase - 0.3;
       const lastIdx = RAMP.length - 1;
-      const ax = cur.ax + jitter.ax;
-      const ay = cur.ay + jitter.ay;
+      const seed = seedRef.current;
+      const ax = cur.ax + seed.jx;
+      const ay = cur.ay + seed.jy;
       const norm = (1.15 / (Math.abs(ax) + Math.abs(ay))) * 0.5;
       const aspect = CELL_W / CELL_H;
 
@@ -120,6 +164,12 @@ export default function AsciiField() {
           const dy = (v - 0.5) * 2.2;
           const quiet = Math.min(1, Math.max(0, Math.hypot(dx, dy) - 0.25) / 0.55);
           let l = Math.min(1, band + trail + noise * (band + trail + 0.2)) * (0.08 + 0.92 * quiet * quiet);
+          if (w > 0) {
+            const d = Math.hypot(dx, dy) + 0.02;
+            const ang = Math.atan2(dy, dx);
+            const tl = Math.pow(0.5 + 0.5 * Math.sin(1.6 / d - t * (4 + w * 18) + Math.sin(ang * 6 + t) * 0.6), 2) * Math.min(1, d * 1.4);
+            l = l * (1 - w) + tl * w;
+          }
 
           for (let i = 0; i < rings.length; i++) {
             const r = rings[i];
@@ -151,13 +201,18 @@ export default function AsciiField() {
       });
     window.addEventListener("resize", resize);
     window.addEventListener("pointerdown", onDown);
+    window.addEventListener("warp-in", onWarp);
     return () => {
       alive = false;
       cancelAnimationFrame(frame);
       window.removeEventListener("resize", resize);
       window.removeEventListener("pointerdown", onDown);
+      window.removeEventListener("warp-in", onWarp);
     };
   }, []);
 
   return <canvas ref={canvasRef} className="field" style={{ opacity: 0, transition: "opacity 400ms ease" }} aria-hidden="true" />;
 }
+
+
+

@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { pool, ready } from "../../../db";
+import { pool, ready } from "@/app/lib/db";
 
 export const runtime = "nodejs";
 
