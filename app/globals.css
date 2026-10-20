@@ -97,6 +97,7 @@
 }
 
 .links { display: flex; gap: 2.5rem; font-size: 1.15rem; letter-spacing: 0.05em; }
+.links { flex-wrap: wrap; justify-content: center; }
 
 .screen a {
   color: #777777;
@@ -156,7 +157,8 @@ body { background: #111111; }
 .dash-form { display: grid; gap: 0.7rem; }
 .dash-form input[type="text"],
 .dash-form input:not([type]),
-.dash-form textarea {
+.dash-form textarea,
+.dash-form select {
   width: 100%;
   padding: 0.5rem 0.7rem;
   background: #161616;
@@ -167,7 +169,8 @@ body { background: #111111; }
   resize: vertical;
 }
 .dash-form input:focus,
-.dash-form textarea:focus { border-color: #444444; }
+.dash-form textarea:focus,
+.dash-form select:focus { border-color: #444444; }
 .dash-file { display: block; padding: 0.5rem 0.7rem; border: 1px dashed #333333; color: #777777; cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .dash-file input { display: none; }
 .dash-form .button { justify-self: start; color: #9a9a9a; font: inherit; cursor: pointer; }
@@ -218,4 +221,17 @@ body { background: #111111; }
 .dash-card button { background: none; border: 0; color: #666666; font: inherit; cursor: pointer; padding: 0; }
 .dash-card button:hover { color: #b0b0b0; }
 .dash-card textarea, .dash-card input { width: 100%; background: transparent; border: 1px solid #222222; color: inherit; font: inherit; padding: 0.4rem 0.6rem; outline: none; }
+.dash-card select { width: 100%; background: #161616; border: 1px solid #222222; color: inherit; font: inherit; padding: 0.4rem 0.6rem; outline: none; }
 .dash-log { border-top: 1px dashed #222222; padding-top: 0.4rem; display: grid; gap: 0.3rem; white-space: pre-wrap; }
+
+.plan-status { margin: 0; color: #777; font-size: 0.85rem; }
+.plan-keywords { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.plan-keywords span { border: 1px solid #303030; padding: 0.1rem 0.4rem; color: #888; font-size: 0.78rem; }
+.plan-result { width: min(44rem, 92vw); max-height: 56vh; overflow-y: auto; margin: 0 auto; text-align: left; }
+.plan-result .md { margin-top: 1rem; }
+.dash-plan { display: grid; gap: 0.5rem; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid #292929; }
+.plan-todos { border-top: 1px solid #292929; padding-top: 0.8rem; }
+.plan-todos ul { display: grid; gap: 0.45rem; margin: 0; padding: 0; list-style: none; }
+.plan-todos li { display: grid; grid-template-columns: 2.5rem 1fr; gap: 0.4rem; font-size: 0.95rem; }
+.plan-todos li > span:first-child { color: #777; }
+.plan-todos li.done > span:last-child { color: #666; text-decoration: line-through; }

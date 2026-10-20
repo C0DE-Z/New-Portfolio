@@ -13,6 +13,7 @@ export async function DELETE(_: Request, { params }: { params: Promise<{ id: str
   await ready();
   await pool.query("DELETE FROM media WHERE post_id = $1", [id]);
   await pool.query("DELETE FROM devlogs WHERE project_id = $1", [id]);
+  await pool.query("DELETE FROM plans WHERE project_id = $1", [id]);
   await pool.query("DELETE FROM projects WHERE id = $1", [id]);
   return NextResponse.json({ ok: true });
 }
@@ -32,5 +33,6 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   if (link && !/^https?:\/\/\S+$/i.test(link)) return NextResponse.json({ error: "Invalid link" }, { status: 400 });
   await ready();
   await pool.query("UPDATE projects SET name=$1, summary=$2, body=$3, link=$4, updated_at=now() WHERE id=$5", [name, summary, body, link || null, id]);
+  await pool.query("UPDATE plans SET name=$1 WHERE project_id=$2", [name, id]);
   return NextResponse.json({ ok: true });
 }

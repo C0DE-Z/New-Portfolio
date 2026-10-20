@@ -5,6 +5,19 @@ import { WipeReveal, useWipeNav } from "@/app/components/wipe";
 
 type Log = { id: string; body: string; created: string; updated: string | null };
 type Post = { id: string; title: string; body: string; created: string; updated: string | null; files: number };
+type PlanTodo = { text: string; done: boolean };
+type Plan = {
+  id: string;
+  projectId: string | null;
+  name: string;
+  summary: string;
+  status: string;
+  keywords: string[];
+  storyboard: string;
+  todos: PlanTodo[];
+  created: string;
+  updated: string | null;
+};
 type Proj = {
   id: string;
   name: string;
@@ -20,6 +33,7 @@ type Proj = {
 
 type Tab = "projects" | "posts" | "new project" | "new post";
 const TABS: Tab[] = ["projects", "posts", "new project", "new post"];
+const formatTodos = (todos: PlanTodo[]) => todos.map((todo) => `- [${todo.done ? "x" : " "}] ${todo.text}`).join("\n");
 
 const fmt = (s: string) => new Date(s).toLocaleString([], { dateStyle: "medium", timeStyle: "short" });
 
@@ -32,7 +46,7 @@ function Stamp({ created, updated }: { created: string; updated: string | null }
   );
 }
 
-export default function Dashboard({ posts, projects }: { posts: Post[]; projects: Proj[] }) {
+export default function Dashboard({ posts, projects, plans }: { posts: Post[]; projects: Proj[]; plans: Plan[] }) {
   const router = useRouter();
   const [go, wipe] = useWipeNav();
   const [tab, setTab] = useState<Tab>("projects");
@@ -41,6 +55,7 @@ export default function Dashboard({ posts, projects }: { posts: Post[]; projects
   const [editing, setEditing] = useState<string | null>(null);
   const [draft, setDraft] = useState<Record<string, string>>({});
   const [logs, setLogs] = useState<Record<string, string>>({});
+  const [planFormProject, setPlanFormProject] = useState<string | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const projRef = useRef<HTMLFormElement>(null);
   const [names, setNames] = useState<string[]>([]);
@@ -90,6 +105,7 @@ export default function Dashboard({ posts, projects }: { posts: Post[]; projects
   const stop = () => {
     setEditing(null);
     setDraft({});
+    setPlanFormProject(null);
   };
 
   const saveProject = async (p: Proj) => {
@@ -105,6 +121,46 @@ export default function Dashboard({ posts, projects }: { posts: Post[]; projects
   const savePost = async (p: Post) => {
     const ok = await call(`/api/posts/${p.id}`, "PATCH", { title: d("title", p.title), body: d("body", p.body) }, "post saved");
     if (ok) stop();
+  };
+
+  const savePlan = async (p: Plan) => {
+    const ok = await call(
+      `/api/plans/${p.id}`,
+      "PATCH",
+      {
+        summary: d("planSummary", p.summary),
+        status: d("planStatus", p.status),
+        keywords: d("planKeywords", p.keywords.join(", ")),
+        storyboard: d("storyboard", p.storyboard),
+        todos: d("todos", formatTodos(p.todos)),
+        codeword: d("planCodeword", ""),
+      },
+      "plan saved",
+    );
+    if (ok) stop();
+  };
+
+  const createPlan = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (busy) return;
+    const form = e.currentTarget;
+    setBusy(true);
+    setStatus("saving plan...");
+    try {
+      const res = await fetch("/api/plans", { method: "POST", body: new FormData(form) });
+      if (res.ok) {
+        form.reset();
+        setPlanFormProject(null);
+        setStatus("plan saved");
+        router.refresh();
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setStatus(data.error ?? "failed");
+      }
+    } catch {
+      setStatus("failed");
+    }
+    setBusy(false);
   };
 
   const saveLog = async (p: Proj, l: Log) => {
@@ -146,7 +202,9 @@ export default function Dashboard({ posts, projects }: { posts: Post[]; projects
         {tab === "projects" && (
           <div className="dash-list">
             {projects.length === 0 && <span className="dash-meta">no projects yet</span>}
-            {projects.map((p) => (
+            {projects.map((p) => {
+              const plan = plans.find((candidate) => candidate.projectId === p.id);
+              return (
               <article key={p.id} className="dash-card">
                 {editing === p.id ? (
                   <>
@@ -205,8 +263,70 @@ export default function Dashboard({ posts, projects }: { posts: Post[]; projects
                 <div className="dash-actions">
                   <button type="button" onClick={() => addLog(p.id)}>add devlog</button>
                 </div>
+                <section className="dash-plan">
+                  <header>
+                    <span className="dash-meta">project plan</span>
+                    {plan && editing !== plan.id && (
+                      <div className="dash-actions">
+                        <button type="button" onClick={() => { stop(); setEditing(plan.id); }}>edit plan</button>
+                        <button type="button" onClick={() => del(`/api/plans/${plan.id}`, "plan")}>delete plan</button>
+                      </div>
+                    )}
+                  </header>
+                  {plan ? editing === plan.id ? (
+                    <>
+                      <input value={d("planSummary", plan.summary)} maxLength={300} onChange={(e) => setD("planSummary", e.target.value)} placeholder="one-line summary" />
+                      <select value={d("planStatus", plan.status)} onChange={(e) => setD("planStatus", e.target.value)}>
+                        <option value="idea">idea</option>
+                        <option value="planned">planned</option>
+                        <option value="in progress">in progress</option>
+                        <option value="paused">paused</option>
+                      </select>
+                      <input value={d("planKeywords", plan.keywords.join(", "))} onChange={(e) => setD("planKeywords", e.target.value)} placeholder="keywords, comma separated" />
+                      <textarea rows={7} value={d("storyboard", plan.storyboard)} onChange={(e) => setD("storyboard", e.target.value)} placeholder="storyboard / notes (markdown)" />
+                      <textarea rows={6} value={d("todos", formatTodos(plan.todos))} onChange={(e) => setD("todos", e.target.value)} placeholder={"todos, one per line\n- [ ] not started\n- [x] completed"} />
+                      <input type="password" autoComplete="new-password" value={d("planCodeword", "")} onChange={(e) => setD("planCodeword", e.target.value)} placeholder="new codeword (blank keeps current)" />
+                      <div className="dash-actions">
+                        <button type="button" onClick={() => savePlan(plan)}>save plan</button>
+                        <button type="button" onClick={stop}>cancel</button>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <span>{plan.status}{plan.summary ? ` · ${plan.summary}` : ""}</span>
+                      {plan.keywords.length > 0 && <span className="dash-meta">{plan.keywords.join(" · ")}</span>}
+                      <span className="dash-meta">{plan.todos.filter((todo) => todo.done).length}/{plan.todos.length} todos complete · revealed through words</span>
+                      <Stamp created={plan.created} updated={plan.updated} />
+                    </>
+                  ) : planFormProject === p.id ? (
+                    <form onSubmit={createPlan} className="dash-form">
+                      <input type="hidden" name="projectId" value={p.id} />
+                      <input type="password" name="codeword" placeholder="project codeword" maxLength={128} required autoComplete="new-password" />
+                      <input name="summary" placeholder="one-line summary" maxLength={300} autoComplete="off" />
+                      <select name="status" defaultValue="idea">
+                        <option value="idea">idea</option>
+                        <option value="planned">planned</option>
+                        <option value="in progress">in progress</option>
+                        <option value="paused">paused</option>
+                      </select>
+                      <input name="keywords" placeholder="keywords, comma separated" autoComplete="off" />
+                      <textarea name="storyboard" placeholder="storyboard / notes (markdown)" rows={7} />
+                      <textarea name="todos" placeholder={"todos, one per line\n- [ ] not started\n- [x] completed"} rows={6} />
+                      <div className="dash-actions">
+                        <button type="submit" className="button" disabled={busy}>save project plan</button>
+                        <button type="button" onClick={() => setPlanFormProject(null)}>cancel</button>
+                      </div>
+                    </form>
+                  ) : (
+                    <div className="dash-actions">
+                      <span className="dash-meta">no private plan</span>
+                      <button type="button" onClick={() => setPlanFormProject(p.id)}>add plan</button>
+                    </div>
+                  )}
+                </section>
               </article>
-            ))}
+              );
+            })}
           </div>
         )}
 

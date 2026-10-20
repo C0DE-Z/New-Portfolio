@@ -4,7 +4,19 @@ import { pool, ready } from "@/app/lib/db";
 
 export const runtime = "nodejs";
 
-type Entry = { id: string; salt: string; hash: string; type?: "link" | "text" | "post"; url?: string; title?: string; body?: string };
+type Entry = {
+  id: string;
+  salt: string;
+  hash: string;
+  type?: "link" | "text" | "post" | "plan";
+  url?: string;
+  title?: string;
+  body?: string;
+  summary?: string;
+  status?: string;
+  keywords?: string[];
+  todos?: { text: string; done: boolean }[];
+};
 const PAGE_WORDS: { path: string; words: string[] }[] = [
   { path: "/", words: ["home", "main", "start", "welcome"] },
   { path: "/projects", words: ["project", "projects", "things", "work", "portfolio"] },
@@ -28,8 +40,15 @@ async function match(code: string): Promise<Entry | null> {
   await ready();
   const { rows } = await pool.query("SELECT id, salt, hash, type, url, title, body FROM codes");
   const posts = await pool.query("SELECT id::STRING AS id, salt, hash FROM posts WHERE hash IS NOT NULL");
+  const plans = await pool.query(
+    "SELECT id, salt, hash, name AS title, summary, status, keywords, storyboard AS body, todos FROM plans WHERE hash IS NOT NULL AND salt IS NOT NULL",
+  );
   let found: Entry | null = null;
-  for (const e of [...(rows as Entry[]), ...posts.rows.map((p) => ({ ...p, type: "post" as const }))]) {
+  for (const e of [
+    ...(rows as Entry[]),
+    ...posts.rows.map((p) => ({ ...p, type: "post" as const })),
+    ...plans.rows.map((p) => ({ ...p, type: "plan" as const })),
+  ] as Entry[]) {
     const a = scryptSync(code, e.salt, 32);
     if (timingSafeEqual(a, Buffer.from(e.hash, "hex"))) found = e;
   }
@@ -80,6 +99,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid code" }, { status: 401 });
     }
     if (entry.type === "post") return NextResponse.json({ type: "post", id: entry.id });
+    if (entry.type === "plan") {
+      return NextResponse.json({
+        type: "plan",
+        title: entry.title ?? "",
+        summary: entry.summary ?? "",
+        status: entry.status ?? "idea",
+        keywords: entry.keywords ?? [],
+        body: entry.body ?? "",
+        todos: entry.todos ?? [],
+      });
+    }
     if (entry.type === "text") {
       return NextResponse.json({ type: "text", title: entry.title ?? "", body: entry.body ?? "" });
     }
@@ -89,4 +119,3 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Unavailable" }, { status: 500 });
   }
 }
-

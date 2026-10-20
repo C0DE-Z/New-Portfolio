@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { isAdmin } from "@/app/lib/auth";
-import { pool, ready, type Devlog, type Media, type Post, type Project } from "@/app/lib/db";
+import { pool, ready, type Devlog, type Media, type Plan, type Post, type Project } from "@/app/lib/db";
 import Dashboard from "@/app/components/dashboard";
 
 export const dynamic = "force-dynamic";
@@ -13,6 +13,7 @@ export default async function DashboardPage() {
   await ready();
   const posts = (await pool.query("SELECT id, title, body, created_at, updated_at FROM posts ORDER BY created_at DESC")).rows as (Post & { updated_at: Date | null })[];
   const projects = (await pool.query("SELECT id, name, slug, summary, body, link, created_at, updated_at FROM projects ORDER BY created_at DESC")).rows as (Project & { updated_at: Date | null })[];
+  const plans = (await pool.query("SELECT id, project_id, name, summary, status, keywords, storyboard, todos, created_at, updated_at FROM plans ORDER BY created_at DESC")).rows as (Plan & { updated_at: Date | null })[];
   const logs = (await pool.query("SELECT id, project_id, body, created_at, updated_at FROM devlogs ORDER BY created_at DESC")).rows as (Devlog & { updated_at: Date | null })[];
   const media = (await pool.query("SELECT post_id FROM media")).rows as Pick<Media, "post_id">[];
   const counts = new Map<string, number>();
@@ -40,6 +41,18 @@ export default async function DashboardPage() {
         created: iso(p.created_at)!,
         updated: iso(p.updated_at),
         files: counts.get(p.id) ?? 0,
+      }))}
+      plans={plans.map((p) => ({
+        id: p.id,
+        projectId: p.project_id,
+        name: p.name,
+        summary: p.summary,
+        status: p.status,
+        keywords: p.keywords,
+        storyboard: p.storyboard,
+        todos: p.todos,
+        created: iso(p.created_at)!,
+        updated: iso(p.updated_at),
       }))}
     />
   );
