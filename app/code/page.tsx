@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import ReactMarkdown from "react-markdown";
 import { WipeReveal, WipeLink, useWipeNav } from "@/app/components/wipe";
+import Markdown from "@/app/components/markdown";
 
 type PlanResult = {
   title: string;
@@ -99,15 +99,16 @@ export default function CodePage() {
       <WipeReveal />
       {wipe}
       <div className="center rounded">
+        <h1 className="visually-hidden">Code entry</h1>
         {doc && (
           <div className="doc">
-            <p className="prompt">{doc.title}</p>
+            <h2 className="prompt">{doc.title}</h2>
             <div className="doc-body">{doc.body}</div>
           </div>
         )}
         {plan && (
           <section className="doc plan-result">
-            <p className="prompt">{plan.title}</p>
+            <h2 className="prompt">{plan.title}</h2>
             <p className="plan-status">{plan.status}</p>
             {plan.summary && <p className="proj-summary">{plan.summary}</p>}
             {plan.keywords.length > 0 && (
@@ -118,7 +119,7 @@ export default function CodePage() {
             {plan.body && (
               <div className="md">
                 <p className="prompt">storyboard / notes</p>
-                <ReactMarkdown>{plan.body}</ReactMarkdown>
+                <Markdown>{plan.body}</Markdown>
               </div>
             )}
             {plan.todos.length > 0 && (
@@ -152,7 +153,8 @@ export default function CodePage() {
             autoComplete="off"
             spellCheck={false}
             autoFocus
-            aria-label="code"
+            aria-label="Enter a code"
+            maxLength={128}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 e.preventDefault();
@@ -161,7 +163,7 @@ export default function CodePage() {
             }}
           />
         </form>
-        <p className="entry-status">{status}&nbsp;</p>
+        <p className="entry-status" role="status" aria-live="polite">{status}&nbsp;</p>
         <WipeLink href="/" className="back">
           &lt; back
         </WipeLink>

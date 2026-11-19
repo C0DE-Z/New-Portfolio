@@ -1,0 +1,42 @@
+- generic [ref=e1]:
+  - link "skip to content" [ref=e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - main [ref=e5]:
+    - generic [ref=e6]:
+      - heading "Hey, I'm Code-Z" [level=1] [ref=e7]:
+        - text: Hey, I'm
+        - generic "Code-Z" [ref=e8]
+      - navigation [ref=e9]:
+        - link "things" [ref=e10] [cursor=pointer]:
+          - /url: /projects
+        - link "social" [ref=e11] [cursor=pointer]:
+          - /url: /contact
+        - link "words" [ref=e12] [cursor=pointer]:
+          - /url: /code
+  - complementary [ref=e13]:
+    - button "close" [expanded] [ref=e15] [cursor=pointer]
+    - region "display / access" [ref=e16]:
+      - heading "display / access" [level=2] [ref=e17]
+      - generic [ref=e18]:
+        - checkbox "dyslexia-friendly font" [ref=e19]
+        - text: dyslexia-friendly font
+      - generic [ref=e20]:
+        - checkbox "larger text" [ref=e21]
+        - text: larger text
+      - generic [ref=e22]:
+        - checkbox "higher contrast" [ref=e23]
+        - text: higher contrast
+      - generic [ref=e24]:
+        - checkbox "reduce motion" [ref=e25]
+        - text: reduce motion
+      - generic [ref=e26]:
+        - checkbox "brighter keyboard focus" [checked] [active] [ref=e27]
+        - text: brighter keyboard focus
+      - paragraph [ref=e28]: Device motion preferences are also respected.
+      - link "privacy policy" [ref=e29] [cursor=pointer]:
+        - /url: /privacy
+  - status [ref=e30]:
+    - generic [ref=e35]:
+      - text: Static route
+      - button "Hide static indicator" [ref=e36] [cursor=pointer]
+  - alert [ref=e40]

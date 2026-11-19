@@ -23,11 +23,17 @@ export function Choice({
   names?: Record<string, string>;
 }) {
   return (
-    <div>
+    <div role="group" aria-label={title || "Options"}>
       <div className={label}>{title}</div>
       <div className="grid grid-cols-3 gap-1 mt-1">
         {options.map((o) => (
-          <button key={o} onClick={() => onPick(o)} className={`border px-1 py-1 text-[10px] truncate ${value === o ? on : off}`}>
+          <button
+            key={o}
+            type="button"
+            aria-pressed={value === o}
+            onClick={() => onPick(o)}
+            className={`border px-1 py-1 text-[10px] truncate ${value === o ? on : off}`}
+          >
             {names?.[o] ?? o}
           </button>
         ))}

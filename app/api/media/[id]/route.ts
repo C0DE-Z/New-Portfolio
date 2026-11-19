@@ -16,7 +16,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     "Content-Type": rows[0].mime,
     "Accept-Ranges": "bytes",
     "X-Content-Type-Options": "nosniff",
-    "Cache-Control": "public, max-age=31536000, immutable",
+    "Cache-Control": "public, max-age=3600, must-revalidate",
   };
   const m = /^bytes=(\d*)-(\d*)$/.exec(request.headers.get("range") ?? "");
   if (m && (m[1] || m[2])) {

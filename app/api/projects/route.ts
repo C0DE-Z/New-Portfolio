@@ -1,6 +1,7 @@
 ﻿import { NextRequest, NextResponse } from "next/server";
 import { isAdmin } from "@/app/lib/auth";
 import { pool, ready } from "@/app/lib/db";
+import { isSafeHttpUrl } from "@/app/lib/safe-url";
 
 export const runtime = "nodejs";
 
@@ -10,7 +11,11 @@ const IMAGE = /^image\/(png|jpeg|gif|webp|avif)$/;
 const RESERVED = new Set(["new", "api"]);
 
 export async function POST(request: NextRequest) {
-  if (!(await isAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!(await isAdmin(request))) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const contentLength = Number(request.headers.get("content-length"));
+  if (contentLength > MAX_TOTAL + 1_000_000) {
+    return NextResponse.json({ error: "Upload is too large" }, { status: 413 });
+  }
   try {
     const form = await request.formData();
     const name = String(form.get("name") ?? "").trim();
@@ -20,7 +25,9 @@ export async function POST(request: NextRequest) {
     if (!name || name.length > 100 || summary.length > 300 || body.length > 100_000) {
       return NextResponse.json({ error: "Invalid project" }, { status: 400 });
     }
-    if (link && !/^https?:\/\/\S+$/i.test(link)) return NextResponse.json({ error: "Invalid link" }, { status: 400 });
+    if (link && (!/^https?:\/\/\S+$/i.test(link) || !isSafeHttpUrl(link))) {
+      return NextResponse.json({ error: "Invalid link" }, { status: 400 });
+    }
     const base = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 50);
     if (!base || RESERVED.has(base)) return NextResponse.json({ error: "Invalid name" }, { status: 400 });
     const files = form.getAll("files").filter((f): f is File => f instanceof File && f.size > 0);

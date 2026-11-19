@@ -1,13 +1,17 @@
 import { WipeReveal, WipeLink } from "@/app/components/wipe";
 
-export const metadata = { title: "Code-Z | Contact" };
+export const metadata = {
+  title: "Code-Z | Contact",
+  description: "Contact Code-Z and find public profiles.",
+  alternates: { canonical: "/contact" },
+};
 
 export default function Contact() {
   return (
     <main className="screen">
       <WipeReveal />
       <div className="center list contact">
-        <p className="prompt">social</p>
+        <h1 className="prompt">social</h1>
         <ul>
           <li>
             <a href="mailto:C0DEZ3Y@gmail.com">C0DEZ3Y@gmail.com</a>
@@ -22,7 +26,6 @@ export default function Contact() {
               leetcode
             </a>
           </li>
-
         </ul>
         <WipeLink href="/" className="back">
           &lt; back

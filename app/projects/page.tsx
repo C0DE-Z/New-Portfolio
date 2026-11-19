@@ -3,18 +3,18 @@ import { pool, ready, type Project } from "@/app/lib/db";
 import FileOpen from "@/app/components/file-open";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Code-Z | Projects" };
+export const metadata = {
+  title: "Code-Z | Projects",
+  description: "Projects and experiments by Code-Z.",
+  alternates: { canonical: "/projects" },
+};
 
 async function load() {
-  try {
-    await ready();
-    return (await pool.query("SELECT slug, name, summary FROM projects ORDER BY created_at DESC")).rows as Pick<
-      Project,
-      "slug" | "name" | "summary"
-    >[];
-  } catch {
-    return [];
-  }
+  await ready();
+  return (await pool.query("SELECT slug, name, summary FROM projects ORDER BY created_at DESC")).rows as Pick<
+    Project,
+    "slug" | "name" | "summary"
+  >[];
 }
 
 export default async function Projects() {
@@ -23,7 +23,7 @@ export default async function Projects() {
     <main className="screen">
       <WipeReveal />
       <div className="center list">
-        <p className="prompt">things</p>
+        <h1 className="prompt">things</h1>
         <ul>
           {rows.map((p) => (
             <li key={p.slug} className="file">

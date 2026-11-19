@@ -1,4 +1,5 @@
 import AsciiField from "@/app/components/ascii-field";
+import SiteUI from "@/app/components/site-ui";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
@@ -15,17 +16,26 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Code-Z",
-  description: "developer ",
-  keywords: ["Code-Z", "Software", "Open Source","Code","Nick"],
+  metadataBase: new URL("https://c0dez.vercel.app"),
+  title: "Code-Z | Developer Portfolio",
+  description: "Code-Z's developer portfolio: projects, code, and ways to get in touch.",
+  applicationName: "Code-Z",
   openGraph: {
-    title: "Code-Z",
-    description: "human",
+    title: "Code-Z | Developer Portfolio",
+    description: "Projects, code, and ways to get in touch.",
     type: "website",
+    siteName: "Code-Z",
+    url: "/",
+    images: [{ url: "/imgs/imgs/Web.png", alt: "Code-Z developer portfolio" }],
   },
-  other: {
-    "theme-color": "#111111",
+  twitter: {
+    card: "summary",
+    title: "Code-Z | Developer Portfolio",
+    description: "Projects, code, and ways to get in touch.",
+    images: ["/imgs/imgs/Web.png"],
   },
+  robots: { index: true, follow: true },
+  other: { "theme-color": "#111111" },
 };
 
 export default function RootLayout({
@@ -38,8 +48,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-x-hidden`}
       >
-        <AsciiField />
-        {children}
+        <SiteUI>
+          <AsciiField />
+          {children}
+        </SiteUI>
       </body>
     </html>
   );

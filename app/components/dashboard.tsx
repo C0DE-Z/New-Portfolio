@@ -188,16 +188,16 @@ export default function Dashboard({ posts, projects, plans }: { posts: Post[]; p
       <WipeReveal />
       {wipe}
       <div className="center dash">
-        <p className="prompt">dashboard</p>
-        <nav className="dash-tabs">
+        <h1 className="prompt">dashboard</h1>
+        <nav className="dash-tabs" aria-label="Dashboard sections">
           {TABS.map((t) => (
-            <button key={t} type="button" className={t === tab ? "on" : ""} onClick={() => { setTab(t); stop(); }}>
+            <button key={t} type="button" className={t === tab ? "on" : ""} aria-pressed={t === tab} onClick={() => { setTab(t); stop(); }}>
               {t}
               {t === "projects" ? ` (${projects.length})` : t === "posts" ? ` (${posts.length})` : ""}
             </button>
           ))}
         </nav>
-        <p className="entry-status">{status}&nbsp;</p>
+        <p className="entry-status" role="status" aria-live="polite">{status}&nbsp;</p>
 
         {tab === "projects" && (
           <div className="dash-list">
@@ -208,10 +208,10 @@ export default function Dashboard({ posts, projects, plans }: { posts: Post[]; p
               <article key={p.id} className="dash-card">
                 {editing === p.id ? (
                   <>
-                    <input value={d("name", p.name)} maxLength={100} onChange={(e) => setD("name", e.target.value)} placeholder="name" />
-                    <input value={d("summary", p.summary)} maxLength={300} onChange={(e) => setD("summary", e.target.value)} placeholder="summary" />
-                    <input value={d("link", p.link)} maxLength={500} onChange={(e) => setD("link", e.target.value)} placeholder="link" />
-                    <textarea rows={8} value={d("body", p.body)} onChange={(e) => setD("body", e.target.value)} placeholder="write-up (markdown)" />
+                    <input aria-label="Project name" value={d("name", p.name)} maxLength={100} onChange={(e) => setD("name", e.target.value)} placeholder="name" />
+                    <input aria-label="Project summary" value={d("summary", p.summary)} maxLength={300} onChange={(e) => setD("summary", e.target.value)} placeholder="summary" />
+                    <input aria-label="Project link" value={d("link", p.link)} maxLength={500} onChange={(e) => setD("link", e.target.value)} placeholder="link" />
+                    <textarea aria-label="Project write-up" rows={8} value={d("body", p.body)} onChange={(e) => setD("body", e.target.value)} placeholder="write-up (markdown)" />
                     <div className="dash-actions">
                       <button type="button" onClick={() => saveProject(p)}>save</button>
                       <button type="button" onClick={stop}>cancel</button>
@@ -255,6 +255,7 @@ export default function Dashboard({ posts, projects, plans }: { posts: Post[]; p
                   </div>
                 ))}
                 <textarea
+                  aria-label={`New devlog entry for ${p.name}`}
                   rows={2}
                   placeholder="new devlog entry (markdown)"
                   value={logs[p.id] ?? ""}
@@ -275,17 +276,17 @@ export default function Dashboard({ posts, projects, plans }: { posts: Post[]; p
                   </header>
                   {plan ? editing === plan.id ? (
                     <>
-                      <input value={d("planSummary", plan.summary)} maxLength={300} onChange={(e) => setD("planSummary", e.target.value)} placeholder="one-line summary" />
-                      <select value={d("planStatus", plan.status)} onChange={(e) => setD("planStatus", e.target.value)}>
+                      <input aria-label="Plan summary" value={d("planSummary", plan.summary)} maxLength={300} onChange={(e) => setD("planSummary", e.target.value)} placeholder="one-line summary" />
+                      <select aria-label="Plan status" value={d("planStatus", plan.status)} onChange={(e) => setD("planStatus", e.target.value)}>
                         <option value="idea">idea</option>
                         <option value="planned">planned</option>
                         <option value="in progress">in progress</option>
                         <option value="paused">paused</option>
                       </select>
-                      <input value={d("planKeywords", plan.keywords.join(", "))} onChange={(e) => setD("planKeywords", e.target.value)} placeholder="keywords, comma separated" />
-                      <textarea rows={7} value={d("storyboard", plan.storyboard)} onChange={(e) => setD("storyboard", e.target.value)} placeholder="storyboard / notes (markdown)" />
-                      <textarea rows={6} value={d("todos", formatTodos(plan.todos))} onChange={(e) => setD("todos", e.target.value)} placeholder={"todos, one per line\n- [ ] not started\n- [x] completed"} />
-                      <input type="password" autoComplete="new-password" value={d("planCodeword", "")} onChange={(e) => setD("planCodeword", e.target.value)} placeholder="new codeword (blank keeps current)" />
+                      <input aria-label="Plan keywords" value={d("planKeywords", plan.keywords.join(", "))} onChange={(e) => setD("planKeywords", e.target.value)} placeholder="keywords, comma separated" />
+                      <textarea aria-label="Plan storyboard and notes" rows={7} value={d("storyboard", plan.storyboard)} onChange={(e) => setD("storyboard", e.target.value)} placeholder="storyboard / notes (markdown)" />
+                      <textarea aria-label="Plan todos" rows={6} value={d("todos", formatTodos(plan.todos))} onChange={(e) => setD("todos", e.target.value)} placeholder={"todos, one per line\n- [ ] not started\n- [x] completed"} />
+                      <input aria-label="Replace project codeword (optional)" type="password" autoComplete="new-password" value={d("planCodeword", "")} onChange={(e) => setD("planCodeword", e.target.value)} placeholder="new codeword (blank keeps current)" />
                       <div className="dash-actions">
                         <button type="button" onClick={() => savePlan(plan)}>save plan</button>
                         <button type="button" onClick={stop}>cancel</button>
@@ -301,17 +302,17 @@ export default function Dashboard({ posts, projects, plans }: { posts: Post[]; p
                   ) : planFormProject === p.id ? (
                     <form onSubmit={createPlan} className="dash-form">
                       <input type="hidden" name="projectId" value={p.id} />
-                      <input type="password" name="codeword" placeholder="project codeword" maxLength={128} required autoComplete="new-password" />
-                      <input name="summary" placeholder="one-line summary" maxLength={300} autoComplete="off" />
-                      <select name="status" defaultValue="idea">
+                      <input type="password" name="codeword" aria-label="Project codeword" placeholder="project codeword" maxLength={128} required autoComplete="new-password" />
+                      <input name="summary" aria-label="Plan summary" placeholder="one-line summary" maxLength={300} autoComplete="off" />
+                      <select name="status" aria-label="Plan status" defaultValue="idea">
                         <option value="idea">idea</option>
                         <option value="planned">planned</option>
                         <option value="in progress">in progress</option>
                         <option value="paused">paused</option>
                       </select>
-                      <input name="keywords" placeholder="keywords, comma separated" autoComplete="off" />
-                      <textarea name="storyboard" placeholder="storyboard / notes (markdown)" rows={7} />
-                      <textarea name="todos" placeholder={"todos, one per line\n- [ ] not started\n- [x] completed"} rows={6} />
+                      <input name="keywords" aria-label="Plan keywords" placeholder="keywords, comma separated" autoComplete="off" />
+                      <textarea name="storyboard" aria-label="Plan storyboard and notes" placeholder="storyboard / notes (markdown)" rows={7} />
+                      <textarea name="todos" aria-label="Plan todos" placeholder={"todos, one per line\n- [ ] not started\n- [x] completed"} rows={6} />
                       <div className="dash-actions">
                         <button type="submit" className="button" disabled={busy}>save project plan</button>
                         <button type="button" onClick={() => setPlanFormProject(null)}>cancel</button>
@@ -337,8 +338,8 @@ export default function Dashboard({ posts, projects, plans }: { posts: Post[]; p
               <article key={p.id} className="dash-card">
                 {editing === p.id ? (
                   <>
-                    <input value={d("title", p.title)} maxLength={200} onChange={(e) => setD("title", e.target.value)} placeholder="title" />
-                    <textarea rows={8} value={d("body", p.body)} onChange={(e) => setD("body", e.target.value)} placeholder="text" />
+                    <input aria-label="Post title" value={d("title", p.title)} maxLength={200} onChange={(e) => setD("title", e.target.value)} placeholder="title" />
+                    <textarea aria-label="Post text" rows={8} value={d("body", p.body)} onChange={(e) => setD("body", e.target.value)} placeholder="text" />
                     <div className="dash-actions">
                       <button type="button" onClick={() => savePost(p)}>save</button>
                       <button type="button" onClick={stop}>cancel</button>
@@ -370,9 +371,9 @@ export default function Dashboard({ posts, projects, plans }: { posts: Post[]; p
             onSubmit={(e) => submit(e, "/api/posts", formRef, () => setNames([]), "posted", "posts")}
             className="dash-form"
           >
-            <input name="title" placeholder="title" maxLength={200} required autoComplete="off" />
-            <input name="code" placeholder="access code" maxLength={128} required autoComplete="off" />
-            <textarea name="body" placeholder="text" rows={6} />
+            <input name="title" aria-label="Post title" placeholder="title" maxLength={200} required autoComplete="off" />
+            <input name="code" aria-label="Post access code" placeholder="access code" maxLength={128} required autoComplete="new-password" />
+            <textarea name="body" aria-label="Post text" placeholder="text" rows={6} />
             <label className="dash-file">
               <span>{names.length ? names.join(", ") : "attach video / music / images"}</span>
               <input type="file" name="files" multiple accept="video/*,audio/*,image/*" onChange={(e) => setNames(Array.from(e.target.files ?? []).map((f) => f.name))} />
@@ -387,10 +388,10 @@ export default function Dashboard({ posts, projects, plans }: { posts: Post[]; p
             onSubmit={(e) => submit(e, "/api/projects", projRef, () => setPnames([]), "project posted", "projects")}
             className="dash-form"
           >
-            <input name="name" placeholder="name" maxLength={100} required autoComplete="off" />
-            <input name="summary" placeholder="one-line summary" maxLength={300} autoComplete="off" />
-            <input name="link" placeholder="link (https://...) optional" maxLength={500} autoComplete="off" />
-            <textarea name="body" placeholder="write-up (markdown)" rows={6} />
+            <input name="name" aria-label="Project name" placeholder="name" maxLength={100} required autoComplete="off" />
+            <input name="summary" aria-label="Project summary" placeholder="one-line summary" maxLength={300} autoComplete="off" />
+            <input name="link" aria-label="Project link (optional)" placeholder="link (https://...) optional" maxLength={500} autoComplete="off" />
+            <textarea name="body" aria-label="Project write-up" placeholder="write-up (markdown)" rows={6} />
             <label className="dash-file">
               <span>{pnames.length ? pnames.join(", ") : "attach image"}</span>
               <input type="file" name="files" multiple accept="image/*" onChange={(e) => setPnames(Array.from(e.target.files ?? []).map((f) => f.name))} />

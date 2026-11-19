@@ -13,14 +13,17 @@ await pool.query(
 const upsert = async (code, p) => {
   const salt = randomBytes(16).toString("hex");
   await pool.query(
-    "UPSERT INTO codes (id, salt, hash, type, url, title, body) VALUES ($1,$2,$3,$4,$5,$6,$7)",
+    "INSERT INTO codes (id, salt, hash, type, url, title, body) VALUES ($1,$2,$3,$4,$5,$6,$7) ON CONFLICT (id) DO UPDATE SET salt=EXCLUDED.salt, hash=EXCLUDED.hash, type=EXCLUDED.type, url=EXCLUDED.url, title=EXCLUDED.title, body=EXCLUDED.body",
     [id(code), salt, scryptSync(code, salt, 32).toString("hex"), p.type, p.url ?? null, p.title ?? null, p.body ?? null]
   );
   console.log(`saved ${id(code)} (${p.type})`);
 };
 
 if (cmd === "add" && code && type === "link" && a) {
-  new URL(a);
+  const url = new URL(a);
+  if (!["http:", "https:"].includes(url.protocol) || url.username || url.password) {
+    throw new Error("Links must use HTTP or HTTPS and cannot include credentials.");
+  }
   await upsert(code, { type: "link", url: a });
 } else if (cmd === "add" && code && type === "text" && a && b) {
   const body = b.startsWith("@") ? readFileSync(b.slice(1), "utf8") : b;
@@ -35,7 +38,7 @@ if (cmd === "add" && code && type === "link" && a) {
   const list = JSON.parse(readFileSync(code, "utf8"));
   for (const e of list) {
     await pool.query(
-      "UPSERT INTO codes (id, salt, hash, type, url, title, body) VALUES ($1,$2,$3,$4,$5,$6,$7)",
+      "INSERT INTO codes (id, salt, hash, type, url, title, body) VALUES ($1,$2,$3,$4,$5,$6,$7) ON CONFLICT (id) DO UPDATE SET salt=EXCLUDED.salt, hash=EXCLUDED.hash, type=EXCLUDED.type, url=EXCLUDED.url, title=EXCLUDED.title, body=EXCLUDED.body",
       [e.id, e.salt, e.hash, e.type ?? "link", e.url ?? null, e.title ?? null, e.body ?? null]
     );
   }

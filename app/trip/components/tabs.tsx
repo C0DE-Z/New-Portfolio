@@ -72,15 +72,21 @@ export function AudioTab({
       {s.audio && (
         <>
           <div className="flex gap-2 text-xs">
-            <button onClick={() => setSrc("mic")} className={sourceBtn("mic")}>
+            <button
+              type="button"
+              aria-pressed={src === "mic"}
+              onClick={() => setSrc("mic")}
+              className={sourceBtn("mic")}
+            >
               mic
             </button>
-            <label className={`${sourceBtn("file")} text-center cursor-pointer`}>
+            <label className={`trip-file ${sourceBtn("file")} text-center cursor-pointer`}>
               file
               <input
                 type="file"
                 accept="audio/*"
-                className="hidden"
+                aria-label="Choose audio file"
+                className="trip-file-input"
                 onChange={(e) => {
                   const f = e.target.files?.[0];
                   if (f) {
@@ -91,8 +97,10 @@ export function AudioTab({
               />
             </label>
           </div>
-          <div className="text-[10px] text-neutral-500">{msg || "pick mic or upload a track"}</div>
-          <canvas ref={meterRef} width={240} height={110} className="w-full border border-neutral-800" />
+          <div className="text-[10px] text-neutral-500" role="status" aria-live="polite">
+            {msg || "pick mic or upload a track"}
+          </div>
+          <canvas ref={meterRef} width={240} height={110} className="w-full border border-neutral-800" aria-hidden="true" />
           <div className="text-[10px] text-neutral-500 leading-relaxed">
             <span className="text-pink-400">bass</span> grows cells, brightens, kicks the speed.{" "}
             <span className="text-cyan-400">mid</span> shifts hue and bends the shapes.{" "}
@@ -104,7 +112,7 @@ export function AudioTab({
             {(["bass", "mid", "high"] as const).map((b) => (
               <div key={b} className="grid grid-cols-[2.5rem_1fr_1fr] gap-2 items-center">
                 <span className={`text-[10px] ${bandColor[b]}`}>{b}</span>
-                <select className={field} value={s[`${b}To`]} onChange={(e) => set(`${b}To`, e.target.value)}>
+                <select aria-label={`${b} frequency effect`} className={field} value={s[`${b}To`]} onChange={(e) => set(`${b}To`, e.target.value)}>
                   {TARGETS.map((o) => (
                     <option key={o} value={o}>
                       {o}
@@ -113,6 +121,7 @@ export function AudioTab({
                 </select>
                 <input
                   type="range"
+                  aria-label={`${b} effect amount`}
                   min={0}
                   max={3}
                   step={0.05}

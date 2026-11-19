@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { scryptSync, timingSafeEqual } from "node:crypto";
 import { pool, ready } from "@/app/lib/db";
+import { clientIp, limited } from "@/app/lib/limit";
+import { isSafeHttpUrl } from "@/app/lib/safe-url";
 
 export const runtime = "nodejs";
 
@@ -24,22 +26,10 @@ const PAGE_WORDS: { path: string; words: string[] }[] = [
   { path: "/code", words: ["code", "words", "stash", "codes"] },
 ];
 
-const WINDOW = 60_000;
-const LIMIT = 8;
-const hits = new Map<string, number[]>();
-
-function limited(ip: string) {
-  const now = Date.now();
-  const recent = (hits.get(ip) ?? []).filter((t) => now - t < WINDOW);
-  recent.push(now);
-  hits.set(ip, recent);
-  return recent.length > LIMIT;
-}
-
 async function match(code: string): Promise<Entry | null> {
   await ready();
   const { rows } = await pool.query("SELECT id, salt, hash, type, url, title, body FROM codes");
-  const posts = await pool.query("SELECT id::STRING AS id, salt, hash FROM posts WHERE hash IS NOT NULL");
+  const posts = await pool.query("SELECT id::text AS id, salt, hash FROM posts WHERE hash IS NOT NULL");
   const plans = await pool.query(
     "SELECT id, salt, hash, name AS title, summary, status, keywords, storyboard AS body, todos FROM plans WHERE hash IS NOT NULL AND salt IS NOT NULL",
   );
@@ -85,13 +75,20 @@ function relatedPage(input: string) {
 }
 
 export async function POST(request: NextRequest) {
-  const ip = request.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "local";
-  if (limited(ip)) return NextResponse.json({ error: "Too many attempts" }, { status: 429 });
+  if (limited(`stash:${clientIp(request.headers)}`, 8)) {
+    return NextResponse.json({ error: "Too many attempts" }, { status: 429 });
+  }
+  let payload: unknown;
   try {
-    const { name } = await request.json();
-    if (typeof name !== "string" || !name || name.length > 128) {
-      return NextResponse.json({ error: "Invalid request" }, { status: 400 });
-    }
+    payload = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+  }
+  const name = typeof payload === "object" && payload !== null && "name" in payload ? payload.name : undefined;
+  if (typeof name !== "string" || !name || name.length > 128) {
+    return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+  }
+  try {
     const entry = await match(name);
     if (!entry) {
       const path = relatedPage(name);
@@ -114,7 +111,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ type: "text", title: entry.title ?? "", body: entry.body ?? "" });
     }
     if (!entry.url) return NextResponse.json({ error: "Invalid entry" }, { status: 500 });
-    return NextResponse.json({ type: "link", url: entry.url });
+    if (!isSafeHttpUrl(entry.url)) {
+      return NextResponse.json({ error: "Invalid entry" }, { status: 500 });
+    }
+    return NextResponse.json({ type: "link", url: new URL(entry.url).toString() });
   } catch {
     return NextResponse.json({ error: "Unavailable" }, { status: 500 });
   }

@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { useSiteUI } from "@/app/components/site-ui";
 
 const GLYPHS = "01/\\|:;.-=+#";
 const CELL_W = 9;
@@ -46,15 +47,21 @@ function runWipe(canvas: HTMLCanvasElement, mode: "cover" | "reveal", done?: () 
 
 export function WipeReveal() {
   const ref = useRef<HTMLCanvasElement>(null);
+  const { ready, developerMode, transition, reducedMotion } = useSiteUI();
   useEffect(() => {
     const canvas = ref.current;
     if (!canvas) return;
+    if (!ready) return;
+    if (reducedMotion || (developerMode && transition.mode !== "wipe")) {
+      canvas.style.display = "none";
+      return;
+    }
     canvas.style.display = "block";
     document.fonts.ready.then(() => runWipe(canvas, "reveal", () => {
       canvas.style.display = "none";
     }));
-  }, []);
-  return <canvas ref={ref} className="wipe" style={{ background: "#111111" }} aria-hidden="true" />;
+  }, [ready, developerMode, reducedMotion, transition.mode]);
+  return <canvas ref={ref} className="wipe" style={{ display: "none", background: "#111111" }} aria-hidden="true" />;
 }
 
 export function WipeLink({
@@ -67,42 +74,60 @@ export function WipeLink({
   className?: string;
 }) {
   const router = useRouter();
-  const ref = useRef<HTMLCanvasElement>(null);
-  const busy = useRef(false);
+  const { withDeveloperFlag } = useSiteUI();
+  const [go, canvas] = useWipeNav();
+  const destination = withDeveloperFlag(href);
 
   useEffect(() => {
-    router.prefetch(href);
-  }, [router, href]);
+    router.prefetch(destination);
+  }, [router, destination]);
 
   const onClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    const canvas = ref.current;
-    if (!canvas || busy.current || e.metaKey || e.ctrlKey || e.shiftKey) return;
+    if (
+      e.defaultPrevented ||
+      e.button !== 0 ||
+      e.metaKey ||
+      e.ctrlKey ||
+      e.shiftKey ||
+      e.altKey ||
+      e.currentTarget.target === "_blank" ||
+      e.currentTarget.hasAttribute("download")
+    ) return;
     e.preventDefault();
-    busy.current = true;
-    canvas.style.display = "block";
-    runWipe(canvas, "cover", () => router.push(href));
+    go(destination);
   };
 
   return (
     <>
-      <a href={href} className={className} onClick={onClick}>
+      <a href={destination} className={className} onClick={onClick}>
         {children}
       </a>
-      <canvas ref={ref} className="wipe" style={{ display: "none" }} aria-hidden="true" />
+      {canvas}
     </>
   );
 }
 
 export function useWipeNav() {
   const router = useRouter();
+  const { developerMode, transition, reducedMotion, withDeveloperFlag, runExperimentalTransition } = useSiteUI();
   const ref = useRef<HTMLCanvasElement>(null);
   const busy = useRef(false);
   const go = (href: string) => {
+    const destination = withDeveloperFlag(href);
+    const navigate = () => router.push(destination);
+    if (reducedMotion) return navigate();
+    if (developerMode && transition.mode !== "wipe") {
+      runExperimentalTransition(navigate);
+      return;
+    }
     const canvas = ref.current;
-    if (!canvas || busy.current) return router.push(href);
+    if (!canvas || busy.current) return navigate();
     busy.current = true;
     canvas.style.display = "block";
-    runWipe(canvas, "cover", () => router.push(href));
+    runWipe(canvas, "cover", () => {
+      navigate();
+      busy.current = false;
+    });
   };
   const canvas = <canvas ref={ref} className="wipe" style={{ display: "none" }} aria-hidden="true" />;
   return [go, canvas] as const;

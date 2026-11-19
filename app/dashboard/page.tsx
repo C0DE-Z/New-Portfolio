@@ -4,7 +4,7 @@ import { pool, ready, type Devlog, type Media, type Plan, type Post, type Projec
 import Dashboard from "@/app/components/dashboard";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Code-Z | Dashboard", robots: { index: false } };
+export const metadata = { title: "Code-Z | Dashboard", robots: { index: false, follow: false } };
 
 const iso = (d: Date | null) => (d ? new Date(d).toISOString() : null);
 

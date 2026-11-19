@@ -4,7 +4,7 @@ const globalForDb = globalThis as unknown as { pool?: Pool; ready?: Promise<unkn
 
 export const pool = (globalForDb.pool ??= new Pool({ connectionString: process.env.DATABASE_URL, max: 3 }));
 
-const SCHEMA_V = 5;
+const SCHEMA_V = 6;
 
 export function ready() {
   if (globalForDb.readyV !== SCHEMA_V) {
@@ -22,14 +22,16 @@ export function ready() {
     await pool.query("ALTER TABLE posts ADD COLUMN IF NOT EXISTS hash TEXT");
     await pool.query("ALTER TABLE posts ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ");
     await pool.query(
-      "CREATE TABLE IF NOT EXISTS media (id UUID PRIMARY KEY DEFAULT gen_random_uuid(), post_id UUID NOT NULL, name TEXT NOT NULL, mime TEXT NOT NULL, size INT NOT NULL, data BYTEA NOT NULL, created_at TIMESTAMPTZ NOT NULL DEFAULT now(), INDEX (post_id))"
+      "CREATE TABLE IF NOT EXISTS media (id UUID PRIMARY KEY DEFAULT gen_random_uuid(), post_id UUID NOT NULL, name TEXT NOT NULL, mime TEXT NOT NULL, size INT NOT NULL, data BYTEA NOT NULL, created_at TIMESTAMPTZ NOT NULL DEFAULT now())"
     );
+    await pool.query("CREATE INDEX IF NOT EXISTS media_post_id_idx ON media (post_id)");
     await pool.query(
       "CREATE TABLE IF NOT EXISTS projects (id UUID PRIMARY KEY DEFAULT gen_random_uuid(), slug TEXT NOT NULL UNIQUE, name TEXT NOT NULL, summary TEXT NOT NULL DEFAULT '', body TEXT NOT NULL DEFAULT '', link TEXT, created_at TIMESTAMPTZ NOT NULL DEFAULT now())"
     );
     await pool.query(
-      "CREATE TABLE IF NOT EXISTS devlogs (id UUID PRIMARY KEY DEFAULT gen_random_uuid(), project_id UUID NOT NULL, body TEXT NOT NULL, created_at TIMESTAMPTZ NOT NULL DEFAULT now(), INDEX (project_id))"
+      "CREATE TABLE IF NOT EXISTS devlogs (id UUID PRIMARY KEY DEFAULT gen_random_uuid(), project_id UUID NOT NULL, body TEXT NOT NULL, created_at TIMESTAMPTZ NOT NULL DEFAULT now())"
     );
+    await pool.query("CREATE INDEX IF NOT EXISTS devlogs_project_id_idx ON devlogs (project_id)");
     await pool.query("ALTER TABLE projects ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ");
     await pool.query("ALTER TABLE devlogs ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ");
     await pool.query(
@@ -57,7 +59,11 @@ export function ready() {
         await pool.query("INSERT INTO projects (slug, name, link) VALUES ($1, $2, $3) ON CONFLICT (slug) DO NOTHING", [slug, name, link]);
       }
     }
-  })());
+  })().catch((error) => {
+    globalForDb.ready = undefined;
+    globalForDb.readyV = undefined;
+    throw error;
+  }));
 }
 
 export type Project = { id: string; slug: string; name: string; summary: string; body: string; link: string | null; created_at: Date };

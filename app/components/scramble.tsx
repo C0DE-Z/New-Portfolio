@@ -11,6 +11,13 @@ export default function Scramble({ base, alt }: { base: string; alt: string }) {
   const run = (to: string) => {
     cancelAnimationFrame(raf.current);
     target.current = to;
+    if (
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+      document.documentElement.classList.contains("reduce-motion")
+    ) {
+      setText(to);
+      return;
+    }
     const from = text;
     const len = Math.max(from.length, to.length);
     const start = performance.now();
@@ -36,9 +43,13 @@ export default function Scramble({ base, alt }: { base: string; alt: string }) {
       className="name"
       onMouseEnter={() => run(alt)}
       onMouseLeave={() => run(base)}
+      onFocus={() => run(alt)}
+      onBlur={() => run(base)}
+      tabIndex={0}
+      aria-label={base}
       style={{ minWidth: `${Math.max(base.length, alt.length)}ch` }}
     >
-      {text}
+      <span aria-hidden="true">{text}</span>
     </span>
   );
 }

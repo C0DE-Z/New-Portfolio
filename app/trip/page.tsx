@@ -24,6 +24,8 @@ export default function TripPage() {
     let raf = 0;
     let t = 0;
     let last = performance.now();
+    const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let reduce = motionPreference.matches || document.documentElement.classList.contains("reduce-motion");
     const seeds = new Float32Array(400).map(() => Math.random());
     let freq = new Uint8Array(0);
     let beatAvg = 0;
@@ -176,12 +178,32 @@ export default function TripPage() {
         }
         ctx.globalAlpha = 1;
       }
-      raf = requestAnimationFrame(frame);
+      if (!reduce) raf = requestAnimationFrame(frame);
     };
+
+    const syncMotionPreference = () => {
+      const shouldReduce = motionPreference.matches || document.documentElement.classList.contains("reduce-motion");
+      if (shouldReduce === reduce) return;
+      reduce = shouldReduce;
+      if (reduce) {
+        cancelAnimationFrame(raf);
+        raf = 0;
+        frame(performance.now());
+      } else if (!raf) {
+        last = performance.now();
+        motionPreference.addEventListener("change", syncMotionPreference);
+        document.addEventListener("portfolio:preferences", syncMotionPreference);
+        if (reduce) frame(performance.now());
+        else raf = requestAnimationFrame(frame);
+      }
+    };
+
     raf = requestAnimationFrame(frame);
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener("resize", resize);
+      motionPreference.removeEventListener("change", syncMotionPreference);
+      document.removeEventListener("portfolio:preferences", syncMotionPreference);
     };
   }, [level, analyser]);
 
@@ -200,7 +222,8 @@ export default function TripPage() {
 
   return (
     <>
-      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
+      <h1 className="visually-hidden">ASCII visualizer</h1>
+      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" aria-hidden="true" />
       {!open && (
         <button
           aria-label="show settings"

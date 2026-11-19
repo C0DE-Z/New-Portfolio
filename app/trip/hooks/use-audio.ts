@@ -8,6 +8,7 @@ export function useAudio(enabled: boolean, onDenied: () => void) {
   const analyser = useRef<AnalyserNode | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const elRef = useRef<HTMLAudioElement | null>(null);
+  const objectUrlRef = useRef<string | null>(null);
   const level = useRef<Audio>({ bass: 0, mid: 0, high: 0 });
 
   const stop = useCallback(() => {
@@ -15,6 +16,8 @@ export function useAudio(enabled: boolean, onDenied: () => void) {
     streamRef.current = null;
     elRef.current?.pause();
     elRef.current = null;
+    if (objectUrlRef.current) URL.revokeObjectURL(objectUrlRef.current);
+    objectUrlRef.current = null;
     ctxRef.current?.close().catch(() => {});
     ctxRef.current = null;
     analyser.current = null;
@@ -48,7 +51,9 @@ export function useAudio(enabled: boolean, onDenied: () => void) {
   const startFile = useCallback(
     async (file: File) => {
       stop();
-      const el = new Audio(URL.createObjectURL(file));
+      const objectUrl = URL.createObjectURL(file);
+      objectUrlRef.current = objectUrl;
+      const el = new Audio(objectUrl);
       el.loop = true;
       elRef.current = el;
       const { ctx, an } = setup();

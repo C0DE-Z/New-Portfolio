@@ -29,7 +29,15 @@ export function validToken(token: string | undefined) {
   return good.length === got.length && timingSafeEqual(good, got);
 }
 
-export async function isAdmin() {
+export async function isAdmin(request?: Request) {
+  if (request) {
+    const origin = request.headers.get("origin");
+    try {
+      if (!origin || new URL(origin).origin !== new URL(request.url).origin) return false;
+    } catch {
+      return false;
+    }
+  }
   return validToken((await cookies()).get(NAME)?.value);
 }
 

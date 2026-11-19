@@ -1,0 +1,17 @@
+- generic [active] [ref=e1]:
+  - link "skip to content" [ref=e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - main [ref=e5]:
+    - generic [ref=e6]:
+      - heading "Hey, I'm Code-Z" [level=1] [ref=e7]:
+        - text: Hey, I'm
+        - generic "Code-Z" [ref=e8]
+      - navigation [ref=e9]:
+        - link "things" [ref=e10] [cursor=pointer]:
+          - /url: /projects
+        - link "social" [ref=e11] [cursor=pointer]:
+          - /url: /contact
+        - link "words" [ref=e12] [cursor=pointer]:
+          - /url: /code
+  - complementary [ref=e13]:
+    - button "prefs" [ref=e14] [cursor=pointer]

@@ -41,7 +41,7 @@ export default function LoginPage() {
       <WipeReveal />
       {wipe}
       <div className="center">
-        <p className="prompt">login</p>
+        <h1 className="prompt">login</h1>
         <form onSubmit={submit} className="entry">
           <span className="entry-text">{"*".repeat(value.length)}</span>
           <span className="entry-cursor">_</span>
@@ -54,9 +54,10 @@ export default function LoginPage() {
               setValue(e.target.value);
               setStatus("");
             }}
-            autoComplete="off"
+            autoComplete="current-password"
             spellCheck={false}
-            aria-label="password"
+            aria-label="Admin password"
+            maxLength={256}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 e.preventDefault();
@@ -65,7 +66,7 @@ export default function LoginPage() {
             }}
           />
         </form>
-        <p className="entry-status">{status}&nbsp;</p>
+        <p className="entry-status" role="status" aria-live="polite">{status}&nbsp;</p>
         <WipeLink href="/code" className="back">
           &lt; back
         </WipeLink>

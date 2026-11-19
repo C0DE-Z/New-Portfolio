@@ -7,7 +7,7 @@ import { parsePlanKeywords, parsePlanTodos, PLAN_STATUSES } from "@/app/lib/plan
 export const runtime = "nodejs";
 
 export async function POST(request: NextRequest) {
-  if (!(await isAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!(await isAdmin(request))) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const form = await request.formData();
   const projectId = String(form.get("projectId") ?? "");
   const codeword = String(form.get("codeword") ?? "").trim();

@@ -70,7 +70,8 @@ export default function AsciiField() {
     let rows = 0;
     let frame = 0;
     let alive = true;
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let reduce = motionPreference.matches || document.documentElement.classList.contains("reduce-motion");
     const cur: Shape = { ...target.current };
     let phase = Math.random() * 1.6;
     let last = performance.now();
@@ -188,6 +189,20 @@ export default function AsciiField() {
       if (!reduce) frame = requestAnimationFrame(draw);
     };
 
+    const syncMotionPreference = () => {
+      const shouldReduce = motionPreference.matches || document.documentElement.classList.contains("reduce-motion");
+      if (shouldReduce === reduce) return;
+      reduce = shouldReduce;
+      if (reduce) {
+        cancelAnimationFrame(frame);
+        frame = 0;
+        draw(performance.now());
+      } else if (!frame) {
+        last = performance.now();
+        frame = requestAnimationFrame(draw);
+      }
+    };
+
     resize();
     document.fonts
       .load(`${CELL_H - 4}px NerdMono`)
@@ -202,12 +217,16 @@ export default function AsciiField() {
     window.addEventListener("resize", resize);
     window.addEventListener("pointerdown", onDown);
     window.addEventListener("warp-in", onWarp);
+    motionPreference.addEventListener("change", syncMotionPreference);
+    document.addEventListener("portfolio:preferences", syncMotionPreference);
     return () => {
       alive = false;
       cancelAnimationFrame(frame);
       window.removeEventListener("resize", resize);
       window.removeEventListener("pointerdown", onDown);
       window.removeEventListener("warp-in", onWarp);
+      motionPreference.removeEventListener("change", syncMotionPreference);
+      document.removeEventListener("portfolio:preferences", syncMotionPreference);
     };
   }, []);
 

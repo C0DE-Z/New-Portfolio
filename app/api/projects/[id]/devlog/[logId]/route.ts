@@ -8,7 +8,7 @@ const UUID = /^[0-9a-f-]{36}$/i;
 type Ctx = { params: Promise<{ id: string; logId: string }> };
 
 export async function PATCH(request: Request, { params }: Ctx) {
-  if (!(await isAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!(await isAdmin(request))) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const { id, logId } = await params;
   if (!UUID.test(id) || !UUID.test(logId)) return NextResponse.json({ error: "Invalid" }, { status: 400 });
   const { body } = (await request.json().catch(() => ({}))) as { body?: unknown };
@@ -20,8 +20,8 @@ export async function PATCH(request: Request, { params }: Ctx) {
   return NextResponse.json({ ok: true });
 }
 
-export async function DELETE(_: Request, { params }: Ctx) {
-  if (!(await isAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+export async function DELETE(request: Request, { params }: Ctx) {
+  if (!(await isAdmin(request))) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const { id, logId } = await params;
   if (!UUID.test(id) || !UUID.test(logId)) return NextResponse.json({ error: "Invalid" }, { status: 400 });
   await ready();

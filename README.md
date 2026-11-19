@@ -1,55 +1,32 @@
-## Introduction
+# Code-Z portfolio
 
-![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
-![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
-![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)
+A personal developer portfolio built with Next.js App Router, React, TypeScript, and Tailwind CSS. Its terminal-inspired design, ASCII field, and page wipe are intentional parts of the site identity.
 
-Welcome to my portfolio project! This project showcases my skills and projects as a developer. It is built using Next.js and demonstrates my proficiency in modern web development technologies.
+Visit [C0DEZ.vercel.app](https://c0dez.vercel.app).
 
-## View My Proflio at 
-C0DEZ.vercel.app
-### Prerequisites
+## Run locally
 
-Make sure you have the following installed:
-
-- Node.js
-- npm, yarn, pnpm, or bun
-
-### Installation
-
-Clone the repository and install dependencies:
-
-First, run the development server:
+Install dependencies and start the development server:
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000). The project also provides `npm run build`, `npm start`, and `npm run lint`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+The admin and data features use PostgreSQL. Deployment must provide `DATABASE_URL`, `ADMIN_PASSWORD`, and `AUTH_SECRET` as server-only environment variables. Do not expose them through `NEXT_PUBLIC_*` variables.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Accessibility and display options
 
-## Learn More
+Open **prefs** from the site to enable a locally hosted dyslexia-friendly font, larger text, higher contrast, a reduced-motion override, or brighter keyboard focus highlights. Keyboard focus remains visible by default with a subtler outline. These choices are stored in the browser's localStorage and are not sent to the server. The site also respects the operating system's reduced-motion preference.
 
-To learn more about Next.js, take a look at the following resources:
+## Transition experiments
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The current canvas wipe remains the default. To test alternatives, open a page with `?dev=1` (for example, `http://localhost:3000/projects?dev=1`) and open **prefs** to use the transition lab. The selection, duration, intensity, and direction are local experiments; they do not change the default for visitors. Use **exit dev** to remove the query parameter.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Privacy
 
-## Deploy on Vercel
+The site has no analytics, advertising, or contact form. The code-entry and admin login inputs are processed by their respective backend routes and are not saved as visitor submissions. Temporary IP-based rate-limit counters are kept in process memory; public portfolio content is stored in the configured PostgreSQL database. The audio playground analyzes microphone input or a selected file in the browser and does not upload or record audio.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-
-![Project Screenshot](https://raw.githubusercontent.com/C0DE-Z/New-Portfolio/refs/heads/master/imgs/Web.png)
+Read the [privacy policy](/privacy) for details on the admin session cookie, browser storage, hosting/database providers, and published content.

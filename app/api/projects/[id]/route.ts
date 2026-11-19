@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
 import { isAdmin } from "@/app/lib/auth";
 import { pool, ready } from "@/app/lib/db";
+import { isSafeHttpUrl } from "@/app/lib/safe-url";
 
 export const runtime = "nodejs";
 
 const UUID = /^[0-9a-f-]{36}$/i;
 
-export async function DELETE(_: Request, { params }: { params: Promise<{ id: string }> }) {
-  if (!(await isAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  if (!(await isAdmin(request))) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const { id } = await params;
   if (!UUID.test(id)) return NextResponse.json({ error: "Invalid" }, { status: 400 });
   await ready();
@@ -19,7 +20,7 @@ export async function DELETE(_: Request, { params }: { params: Promise<{ id: str
 }
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  if (!(await isAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!(await isAdmin(request))) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const { id } = await params;
   if (!UUID.test(id)) return NextResponse.json({ error: "Invalid" }, { status: 400 });
   const j = (await request.json().catch(() => ({}))) as Record<string, unknown>;
@@ -30,7 +31,9 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   if (!name || name.length > 100 || summary.length > 300 || body.length > 100_000) {
     return NextResponse.json({ error: "Invalid project" }, { status: 400 });
   }
-  if (link && !/^https?:\/\/\S+$/i.test(link)) return NextResponse.json({ error: "Invalid link" }, { status: 400 });
+  if (link && (!/^https?:\/\/\S+$/i.test(link) || !isSafeHttpUrl(link))) {
+    return NextResponse.json({ error: "Invalid link" }, { status: 400 });
+  }
   await ready();
   await pool.query("UPDATE projects SET name=$1, summary=$2, body=$3, link=$4, updated_at=now() WHERE id=$5", [name, summary, body, link || null, id]);
   await pool.query("UPDATE plans SET name=$1 WHERE project_id=$2", [name, id]);

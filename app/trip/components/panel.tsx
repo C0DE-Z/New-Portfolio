@@ -33,11 +33,13 @@ export default function Panel({
     }));
 
   return (
-    <aside className="absolute top-3 right-3 z-10 w-72 max-h-[calc(100vh-1.5rem)] overflow-y-auto border border-neutral-700 bg-black/80 backdrop-blur text-neutral-200">
-      <div className="flex border-b border-neutral-700 text-xs sticky top-0 bg-black z-10">
+    <aside aria-label="Visualizer settings" className="absolute top-3 right-3 z-10 w-72 max-h-[calc(100vh-1.5rem)] overflow-y-auto border border-neutral-700 bg-black/80 backdrop-blur text-neutral-200">
+      <nav aria-label="Visualizer settings sections" className="flex border-b border-neutral-700 text-xs sticky top-0 bg-black z-10">
         {TABS.map((t) => (
           <button
             key={t}
+            type="button"
+            aria-pressed={tab === t}
             onClick={() => setTab(t)}
             className={`flex-1 py-2 uppercase tracking-widest text-[10px] ${tab === t ? "text-cyan-400 border-b border-cyan-400" : "text-neutral-500 hover:text-neutral-300"}`}
           >
@@ -45,10 +47,10 @@ export default function Panel({
             {t === "audio" && s.audio ? " ●" : ""}
           </button>
         ))}
-        <button onClick={close} aria-label="hide panel" className="px-3 text-neutral-500 hover:text-white">
+        <button type="button" onClick={close} aria-label="hide panel" className="px-3 text-neutral-500 hover:text-white">
           ×
         </button>
-      </div>
+      </nav>
       <div className="p-3 space-y-3">
         {tab === "look" && <LookTab s={s} set={set} />}
         {tab === "color" && <ColorTab s={s} set={set} />}

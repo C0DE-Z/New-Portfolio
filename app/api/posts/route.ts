@@ -10,7 +10,11 @@ const MAX_TOTAL = 60 * 1024 * 1024;
 const ALLOWED = /^(image\/(png|jpeg|gif|webp|avif)|video\/(mp4|webm|ogg|quicktime)|audio\/(mpeg|mp3|ogg|wav|x-wav|webm|mp4|aac|flac|x-m4a))$/;
 
 export async function POST(request: NextRequest) {
-  if (!(await isAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!(await isAdmin(request))) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const contentLength = Number(request.headers.get("content-length"));
+  if (contentLength > MAX_TOTAL + 1_000_000) {
+    return NextResponse.json({ error: "Upload is too large" }, { status: 413 });
+  }
   try {
     const form = await request.formData();
     const title = String(form.get("title") ?? "").trim();
