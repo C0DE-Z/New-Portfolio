@@ -14,7 +14,7 @@ export default function Contact() {
         <h1 className="prompt">social</h1>
         <ul>
           <li>
-            <a href="mailto:C0DEZ3Y@gmail.com">C0DEZ3Y@gmail.com</a>
+            <a href="mailto:C0DEZ3Y@gmail.com">email</a>
           </li>
           <li>
             <a href="https://github.com/C0DE-Z" target="_blank" rel="noopener noreferrer">
@@ -26,6 +26,12 @@ export default function Contact() {
               leetcode
             </a>
           </li>
+                <li>
+            <a href="https://discord.com/users/333616865781743616" target="_blank" rel="noopener noreferrer">
+              discord
+            </a>
+          </li>
+          
         </ul>
         <WipeLink href="/" className="back">
           &lt; back
